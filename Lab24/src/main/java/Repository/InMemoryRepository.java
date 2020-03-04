@@ -46,10 +46,17 @@ public class InMemoryRepository<ID,T extends BaseEntity<ID>> implements Reposito
 
     }
 
+    /**
+     * @param id must not be null.
+     * @return it will delete the object.
+     */
+
     @Override
     public Optional<T> delete(ID id) {
-        return Optional.empty();
-        //TO DO
+        if (id == null) {
+            throw new IllegalArgumentException("id must not be null");
+        }
+        return Optional.ofNullable(objects.remove(id));
     }
 
     @Override

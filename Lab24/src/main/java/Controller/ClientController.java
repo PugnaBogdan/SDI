@@ -35,4 +35,13 @@ public class ClientController {
             throw new ValidatorException(v.getMessage());
         }
     }
+
+    public void deleteClient(Integer clientToDelete) throws ValidatorException{
+        try{
+            repo.delete(clientToDelete);
+        }
+        catch (ValidatorException v){
+            throw  new ValidatorException((v.getMessage()));
+        }
+    }
 }

@@ -31,9 +31,10 @@ public class UserInterface {
             System.out.println("Commands: ");
             System.out.println(" 1 - add Client ");
             System.out.println(" 2 - show Clients");
-            System.out.println(" 3 - add Movie ");
-            System.out.println(" 4 - show Movies");
-            System.out.println(" 5 - exit");
+            System.out.println(" 3 - delete Client ");
+            System.out.println(" 4 - add Movie ");
+            System.out.println(" 5 - show Movies");
+            System.out.println(" 6 - exit");
             System.out.println("Input command: ");
             BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
 
@@ -46,9 +47,12 @@ public class UserInterface {
                     printAllClients();
                 }
                 else if(command ==3){
-                    addMovie();
+                    deleteClient();
                 }
                 else if(command ==4){
+                    addMovie();
+                }
+                else if(command ==5){
                     printAllMovies();
                 }
                 else break;
@@ -125,6 +129,21 @@ public class UserInterface {
             ex.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * deletes a client
+     */
+    private void deleteClient(){
+        System.out.println("Type client id you want to delete: ");
+        BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+
+        try{
+            int id = Integer.parseInt(bufferRead.readLine());
+            clientController.deleteClient(id);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
