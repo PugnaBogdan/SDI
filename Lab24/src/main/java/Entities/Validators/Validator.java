@@ -1,5 +1,9 @@
 package Entities.Validators;
 
-public interface Validator {
-    //somehting
+/**
+ * @param <T>
+ * @author Rares.
+ */
+public interface Validator<T> {
+    void validate(T entity) throws ValidatorException;
 }
