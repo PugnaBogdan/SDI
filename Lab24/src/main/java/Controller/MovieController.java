@@ -29,4 +29,25 @@ public class MovieController {
             throw new ValidatorException(v.getMessage());
         }
     }
+    public void filterEvenId()
+    {
+        for (Movie movie: repo.findAll())
+        {
+            if(movie.getId()%2==0)
+                repo.delete(movie.getId());
+        }
+    }
+
+    /*
+    filters movies that have the title length less than some number
+     */
+
+    public void filterMoviesWithTitleLessThan(int length)
+    {
+        for(Movie movie: repo.findAll())
+        {
+            if(movie.getTitle().length() < length)
+                repo.delete(movie.getId());
+        }
+    }
 }
