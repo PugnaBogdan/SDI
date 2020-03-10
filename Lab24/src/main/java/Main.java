@@ -1,6 +1,7 @@
 import Controller.ClientController;
         import Controller.MovieController;
-        import Entities.Client;
+import Controller.RentalController;
+import Entities.Client;
         import Entities.Movie;
         import Entities.Validators.ClientValidator;
         import Entities.Validators.MovieValidator;

@@ -33,4 +33,18 @@ public class RentalController {
             throw new ValidatorException(v.getMessage());
         }
     }
+    public Set<RentAction> getAllRents() {
+        Iterable<RentAction> movies = repo.findAll();
+        return (Set<RentAction>) movies;
+    }
+
+    public void deleteRent(Integer rentToDelete) throws ValidatorException{
+        try{
+            repo.delete(rentToDelete);
+        }
+        catch (ValidatorException v){
+            throw  new ValidatorException((v.getMessage()));
+        }
+    }
+
 }

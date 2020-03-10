@@ -29,6 +29,16 @@ public class MovieController {
             throw new ValidatorException(v.getMessage());
         }
     }
+
+    public void deleteMovie(Integer movieToDelete) throws ValidatorException{
+        try{
+            repo.delete(movieToDelete);
+        }
+        catch (ValidatorException v){
+            throw  new ValidatorException((v.getMessage()));
+        }
+    }
+
     public void filterEvenId()
     {
         for (Movie movie: repo.findAll())

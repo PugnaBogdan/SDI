@@ -38,7 +38,7 @@ public class Movie extends BaseEntity<Integer> {
         return title;
     }
 
-    public void setId(int id) {
+    public void setMovieIdId(int id) {
         this.movieId = id;
     }
 
