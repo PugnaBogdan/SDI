@@ -1,6 +1,7 @@
 package Controller;
 
         import Entities.Movie;
+        import Entities.Validators.MovieValidator;
         import Entities.Validators.ValidatorException;
         import Repository.Repository;
 
@@ -12,9 +13,11 @@ package Controller;
 public class MovieController {
 
     private Repository<Integer, Movie> repo;
+    private MovieValidator validator;
 
     public MovieController(Repository<Integer, Movie> initRepo) {
         repo = initRepo;
+        validator = new MovieValidator();
     }
 
     public Set<Movie> getAllMovies() {
@@ -24,6 +27,7 @@ public class MovieController {
 
     public void addMovie(Movie movieToAdd) throws ValidatorException {
         try {
+            validator.validate(movieToAdd);
             repo.save(movieToAdd);
         } catch (ValidatorException v) {
             throw new ValidatorException(v.getMessage());
