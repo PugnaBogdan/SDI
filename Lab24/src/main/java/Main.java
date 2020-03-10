@@ -9,6 +9,7 @@ import Entities.Validators.ClientValidator;
 import Entities.Validators.RentalValidator;
 import Entities.Validators.Validator;
         import Repository.InMemoryRepository;
+        import Repository.ClientFileRepository;
         import Repository.Repository;
         import Ui.UserInterface;
 
@@ -22,7 +23,7 @@ public class Main {
         Validator<Client> clientValidator = new ClientValidator();
         Validator<RentAction> rentalValidator = new RentalValidator();
         Repository<Integer, Movie> movieRepository = new InMemoryRepository<>(movieValidator);
-        Repository<Integer, Client> clientRepository = new InMemoryRepository<>(clientValidator);
+        Repository<Integer, Client> clientRepository = new ClientFileRepository(clientValidator,"D:\\anul2_sem2\\mpp\\SDI\\Lab24\\src\\main\\resources\\ClientRep.txt");
         Repository<Integer, RentAction> rentActionRepository = new InMemoryRepository<>(rentalValidator);
         ClientController clientController = new ClientController(clientRepository);
         MovieController movieController = new MovieController(movieRepository);
