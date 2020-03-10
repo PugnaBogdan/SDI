@@ -22,10 +22,10 @@ public class UserInterface {
     private MovieController movieController;
     private RentalController rentalController;
 
-    public UserInterface(ClientController clientController1, MovieController movieController1) {
+    public UserInterface(ClientController clientController1, MovieController movieController1, RentalController rentalController) {
         this.clientController = clientController1;
         this.movieController = movieController1;
-        //this.rentalController = rentalController;
+        this.rentalController = rentalController;
     }
 
     public void runConsole() {
@@ -39,7 +39,10 @@ public class UserInterface {
             System.out.println(" 4 - add Movie ");
             System.out.println(" 5 - show Movies");
             System.out.println(" 6 - delete Movie");
-            System.out.println(" 7 - exit");
+            System.out.println(" 7 - add Rent");
+            System.out.println(" 8 - show Rents");
+            System.out.println(" 8 - delete Rent");
+            System.out.println(" 0 - exit");
             System.out.println("Input command: ");
             BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
 
@@ -63,6 +66,15 @@ public class UserInterface {
                 else if(command ==6){
                     deleteMovie();
                 }
+                else if(command ==7){
+                    addRent();
+                }
+                else if(command ==8){
+                    printAllRents();
+                }
+                else if(command ==9){
+                    deleteRent();
+                }
                 else break;
 
             } catch (IOException ex) {
@@ -81,6 +93,11 @@ public class UserInterface {
         Set<Movie> students = movieController.getAllMovies();
         students.forEach(System.out::println);
     }
+    private void printAllRents() {
+        Set<RentAction> rents = rentalController.getAllRentals();
+        rents.forEach(System.out::println);
+    }
+
 
     private void addClient() {
 
@@ -150,7 +167,7 @@ public class UserInterface {
     }
 
     private RentAction readRent() {
-        System.out.println("Read client {id, name, age}");
+        System.out.println("Read rental {rentId, clientId, movieId}");
 
         BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
         try {
@@ -188,6 +205,17 @@ public class UserInterface {
         try{
             int id = Integer.parseInt(bufferRead.readLine());
             movieController.deleteMovie(id);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private void deleteRent(){
+        System.out.println("Type rent id you want to delete: ");
+        BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+
+        try{
+            int id = Integer.parseInt(bufferRead.readLine());
+            rentalController.deleteRent(id);
         } catch (IOException e) {
             e.printStackTrace();
         }
