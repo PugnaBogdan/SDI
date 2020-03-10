@@ -44,4 +44,26 @@ public class ClientController {
             throw  new ValidatorException((v.getMessage()));
         }
     }
+
+    public void filterOddId()
+    {
+        for (Client client: repo.findAll())
+        {
+            if(client.getId()%2!=0)
+                repo.delete(client.getId());
+        }
+    }
+
+    /*
+    filters clients that have the name length less than some number
+     */
+
+    public void filterClientsWithNameLessThan(int length)
+    {
+        for(Client client: repo.findAll())
+        {
+            if(client.getName().length() < length)
+                repo.delete(client.getId());
+        }
+    }
 }

@@ -33,4 +33,14 @@ public class RentalController {
             throw new ValidatorException(v.getMessage());
         }
     }
+
+    public void deleteRent(Integer rentToDelete) throws ValidatorException{
+        try{
+            repo.delete(rentToDelete);
+        }
+        catch (ValidatorException v){
+            throw  new ValidatorException((v.getMessage()));
+        }
+    }
+
 }
