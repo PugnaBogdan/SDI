@@ -16,11 +16,9 @@ package Repository;
 public class InMemoryRepository<ID,T extends BaseEntity<ID>> implements Repository<ID,T> {
 
     private Map<ID,T> objects;
-    private Validator<T> validator;
 
-    public InMemoryRepository(Validator<T> initValidator)
+    public InMemoryRepository()
     {
-        validator=initValidator;
         objects= new HashMap<>();
     }
 
@@ -38,11 +36,10 @@ public class InMemoryRepository<ID,T extends BaseEntity<ID>> implements Reposito
     }
 
     @Override
-    public Optional<T> save(T entity) throws ValidatorException {
+    public Optional<T> save(T entity) {
 
         if(entity==null)
             throw new IllegalArgumentException("id must not be null");
-        validator.validate(entity);
 
         return Optional.ofNullable(objects.putIfAbsent(entity.getId(), entity));
 
@@ -62,7 +59,7 @@ public class InMemoryRepository<ID,T extends BaseEntity<ID>> implements Reposito
     }
 
     @Override
-    public Optional<T> update(T entity) throws ValidatorException {
+    public Optional<T> update(T entity){
         return Optional.empty();
         //TO DO
     }

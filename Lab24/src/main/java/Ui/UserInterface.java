@@ -41,7 +41,11 @@ public class UserInterface {
             System.out.println(" 6 - delete Movie");
             System.out.println(" 7 - add Rent");
             System.out.println(" 8 - show Rents");
-            System.out.println(" 8 - delete Rent");
+            System.out.println(" 9 - delete Rent");
+            System.out.println(" 10 - filter client by odd Id");
+            System.out.println(" 11 - filter movie by name length");
+            System.out.println(" 12 - filter movie by even ID");
+            System.out.println(" 13 - filter client by name length");
             System.out.println(" 0 - exit");
             System.out.println("Input command: ");
             BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
@@ -74,6 +78,18 @@ public class UserInterface {
                 }
                 else if(command ==9){
                     deleteRent();
+                }
+                else if(command ==10){
+                    filterOddIdClient();
+                }
+                else if(command ==11){
+                    filterMovieByNameLength();
+                }
+                else if(command ==12){
+                    filterEvenMovie();
+                }
+                else if(command ==13){
+                    filterClientByNameLength();
                 }
                 else break;
 
@@ -219,6 +235,24 @@ public class UserInterface {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void filterOddIdClient(){
+        clientController.filterOddId();
+    }
+    private void filterEvenMovie(){
+        movieController.filterEvenId();
+    }
+
+    private void filterMovieByNameLength() throws IOException {
+        System.out.println("Type title length: ");
+        BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+        movieController.filterMoviesWithTitleLessThan(Integer.parseInt(bufferRead.readLine()));
+    }
+    private void filterClientByNameLength() throws IOException {
+        System.out.println("Type name length: ");
+        BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+        clientController.filterClientsWithNameLessThan(Integer.parseInt(bufferRead.readLine()));
     }
 
 

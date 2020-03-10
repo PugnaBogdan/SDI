@@ -21,8 +21,8 @@ package Repository;
 public class ClientFileRepository extends InMemoryRepository<Integer, Client> {
     private String fileName;
 
-    public ClientFileRepository(Validator<Client> initValidator, String fileName) {
-        super(initValidator);
+    public ClientFileRepository( String fileName) {
+
         this.fileName = fileName;
 
         loadData();

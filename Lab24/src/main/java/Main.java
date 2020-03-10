@@ -22,9 +22,9 @@ public class Main {
         Validator<Movie> movieValidator = new MovieValidator();
         Validator<Client> clientValidator = new ClientValidator();
         Validator<RentAction> rentalValidator = new RentalValidator();
-        Repository<Integer, Movie> movieRepository = new InMemoryRepository<>(movieValidator);
-        Repository<Integer, Client> clientRepository = new ClientFileRepository(clientValidator,"D:\\anul2_sem2\\mpp\\SDI\\Lab24\\src\\main\\resources\\ClientRep.txt");
-        Repository<Integer, RentAction> rentActionRepository = new InMemoryRepository<>(rentalValidator);
+        InMemoryRepository movieRepository = new InMemoryRepository();
+        Repository<Integer, Client> clientRepository = new ClientFileRepository("D:\\anul2_sem2\\mpp\\SDI\\Lab24\\src\\main\\resources\\ClientRep.txt");
+        InMemoryRepository rentActionRepository = new InMemoryRepository();
         ClientController clientController = new ClientController(clientRepository);
         MovieController movieController = new MovieController(movieRepository);
         RentalController rentalController = new RentalController(rentActionRepository, clientController, movieController);

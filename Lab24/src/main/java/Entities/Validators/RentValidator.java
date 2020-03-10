@@ -6,7 +6,7 @@ public class RentValidator implements Validator<RentAction> {
 
     @Override
     public void validate(RentAction rent) throws ValidatorException {
-        if(rent.getId() < 0)
+        if(rent.getRentId() < 0)
             throw new ValidatorException("Invalid Rent Id!");
 
         if(rent.getMovieId()<0)

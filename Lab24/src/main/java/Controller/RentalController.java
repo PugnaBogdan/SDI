@@ -34,7 +34,8 @@ public class RentalController {
 
     public void addRental(RentAction rentalToAdd) throws ValidatorException {
         try {
-            validator.validate(rentalToAdd);
+
+
 
             int clientID = rentalToAdd.getClientId();
             int movieID = rentalToAdd.getMovieId();
@@ -42,20 +43,16 @@ public class RentalController {
             Optional<Client> c = clientController.getById(clientID);
             Optional<Movie> m = movieController.getById(movieID);
 
-            if(c.get()==null)
+            if(!c.isPresent())
                 throw new ValidatorException("Client does not exist");
 
-            if(m.get()==null)
+            if(!m.isPresent())
                 throw new ValidatorException("Movie does not exist");
-
-
-
-
 
             for(RentAction rent : repo.findAll())
                 if(rent.getMovieId()==rentalToAdd.getMovieId())
                     throw new RentalException("Movie already rented!");
-
+            validator.validate(rentalToAdd);
             repo.save(rentalToAdd);
         } catch (ValidatorException v) {
             throw new ValidatorException(v.getMessage());
