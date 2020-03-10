@@ -5,6 +5,7 @@ package Controller;
         import Entities.Validators.ValidatorException;
         import Repository.Repository;
 
+        import java.util.Optional;
         import java.util.Set;
 
 /**
@@ -19,6 +20,11 @@ public class ClientController {
     {
         this.repo=initRepo;
         validator = new ClientValidator();
+    }
+
+    public Optional<Client> getById(Integer clientId)
+    {
+        return repo.findOne(clientId);
     }
 
     public Set<Client> getAllClients()

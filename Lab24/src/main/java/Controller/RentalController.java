@@ -9,6 +9,7 @@ import Entities.Validators.ValidatorException;
 import Repository.Repository;
 
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,22 +36,16 @@ public class RentalController {
         try {
             validator.validate(rentalToAdd);
 
-            Set<Movie> movies = movieController.getAllMovies();
-            Set<Client> clients = clientController.getAllClients();
-
             int clientID = rentalToAdd.getClientId();
             int movieID = rentalToAdd.getMovieId();
 
-            Set<Integer> clientIds = clients.stream().map(Client::getId)
-                    .collect(Collectors.toSet());
+            Optional<Client> c = clientController.getById(clientID);
+            Optional<Movie> m = movieController.getById(movieID);
 
-            if(!clientIds.contains(clientID))
+            if(c.get()==null)
                 throw new ValidatorException("Client does not exist");
 
-            Set<Integer> movieIds = movies.stream().map(Movie::getId)
-                    .collect(Collectors.toSet());
-
-            if(!movieIds.contains(movieID))
+            if(m.get()==null)
                 throw new ValidatorException("Movie does not exist");
 
 

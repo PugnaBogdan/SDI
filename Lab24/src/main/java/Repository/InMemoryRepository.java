@@ -26,8 +26,10 @@ public class InMemoryRepository<ID,T extends BaseEntity<ID>> implements Reposito
 
     @Override
     public Optional<T> findOne(ID id) {
-        return Optional.empty();
-        //TO DO
+        if (id == null) {
+            throw new IllegalArgumentException("id must not be null");
+        }
+        return Optional.ofNullable(objects.get(id));
     }
 
     @Override
