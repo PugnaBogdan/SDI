@@ -1,6 +1,7 @@
 package Controller;
 
         import Entities.Client;
+        import Entities.Validators.ClientValidator;
         import Entities.Validators.ValidatorException;
         import Repository.Repository;
 
@@ -12,10 +13,12 @@ package Controller;
 public class ClientController {
 
     private Repository<Integer, Client> repo;
+    private ClientValidator validator;
 
     public ClientController(Repository<Integer,Client> initRepo)
     {
         this.repo=initRepo;
+        validator = new ClientValidator();
     }
 
     public Set<Client> getAllClients()
@@ -28,12 +31,13 @@ public class ClientController {
     {
         try
         {
-            repo.save(clientToSave);
+            validator.validate(clientToSave);
         }
         catch(ValidatorException v)
         {
             throw new ValidatorException(v.getMessage());
         }
+        repo.save(clientToSave);
     }
 
     public void deleteClient(Integer clientToDelete) throws ValidatorException{

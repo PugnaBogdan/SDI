@@ -10,7 +10,7 @@ public class ClientValidator implements Validator<Client> {
 
     @Override
     public void validate(Client client) throws ValidatorException {
-        if(client.getId() < 0)
+        if(client.getId()<0)
             throw new ValidatorException("Invalid ID!");
 
         if(client.getName().equals(""))

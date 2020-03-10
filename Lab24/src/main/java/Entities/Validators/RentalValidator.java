@@ -11,9 +11,9 @@ public class RentalValidator implements Validator<RentAction> {
             throw new ValidatorException("Invalid ID!");
 
         if(rent.getMovieId() < 0)
-            throw new ValidatorException("Invalid ID!");
+            throw new ValidatorException("Invalid Movie ID!");
 
         if(rent.getClientId()<0)
-            throw new ValidatorException("Invalid ID!");
+            throw new ValidatorException("Invalid Client ID!");
     }
 }
