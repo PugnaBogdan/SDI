@@ -5,6 +5,7 @@ package Controller;
         import Entities.Validators.ValidatorException;
         import Repository.Repository;
 
+        import java.util.Optional;
         import java.util.Set;
 
 /**
@@ -18,6 +19,11 @@ public class MovieController {
     public MovieController(Repository<Integer, Movie> initRepo) {
         repo = initRepo;
         validator = new MovieValidator();
+    }
+
+    public Optional<Movie> getById(Integer movieId)
+    {
+        return repo.findOne(movieId);
     }
 
     public Set<Movie> getAllMovies() {
