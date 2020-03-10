@@ -56,7 +56,8 @@ public class ClientFileRepository extends InMemoryRepository<Integer, Client> {
     public Optional<Client> save(Client entity) throws ValidatorException {
         Optional<Client> optional = super.save(entity);
         if (optional.isPresent()) {
-            return optional;
+            throw new ValidatorException("already in ID!");
+
         }
         saveToFile(entity);
         return Optional.empty();

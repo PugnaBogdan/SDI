@@ -27,7 +27,7 @@ public class Main {
         Repository<Integer, RentAction> rentActionRepository = new InMemoryRepository<>(rentalValidator);
         ClientController clientController = new ClientController(clientRepository);
         MovieController movieController = new MovieController(movieRepository);
-        RentalController rentalController = new RentalController(rentActionRepository);
+        RentalController rentalController = new RentalController(rentActionRepository, clientController, movieController);
         UserInterface ui = new UserInterface(clientController, movieController, rentalController);
         ui.runConsole();
 

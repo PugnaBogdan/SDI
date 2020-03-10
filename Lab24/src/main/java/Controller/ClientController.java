@@ -32,6 +32,7 @@ public class ClientController {
         try
         {
             validator.validate(clientToSave);
+
         }
         catch(ValidatorException v)
         {
