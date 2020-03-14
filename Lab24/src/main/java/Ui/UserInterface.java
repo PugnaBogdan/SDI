@@ -43,7 +43,7 @@ public class UserInterface {
             System.out.println(" 8 - show Rents");
             System.out.println(" 9 - delete Rent");
             System.out.println(" 10 - filter client by odd Id");
-            System.out.println(" 11 - filter movie by name length");
+            System.out.println(" 11 - filter movie by title length");
             System.out.println(" 12 - filter movie by even ID");
             System.out.println(" 13 - filter client by name length");
             System.out.println(" 0 - exit");
@@ -237,22 +237,30 @@ public class UserInterface {
         }
     }
 
-    private void filterOddIdClient(){
-        clientController.filterOddId();
+    private void filterOddIdClient()
+    {
+        Set<Client> filtered = clientController.filterOddId();
+
+        filtered.forEach(System.out::println);
     }
-    private void filterEvenMovie(){
-        movieController.filterEvenId();
+    private void filterEvenMovie()
+    {
+        Set<Movie> filtered = movieController.filterEvenId();
+        filtered.forEach(System.out::println);
     }
 
     private void filterMovieByNameLength() throws IOException {
         System.out.println("Type title length: ");
+
         BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
-        movieController.filterMoviesWithTitleLessThan(Integer.parseInt(bufferRead.readLine()));
+        Set<Movie> filtered = movieController.filterMoviesWithTitleLessThan(Integer.parseInt(bufferRead.readLine()));
+        filtered.forEach(System.out::println);
     }
     private void filterClientByNameLength() throws IOException {
         System.out.println("Type name length: ");
         BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
-        clientController.filterClientsWithNameLessThan(Integer.parseInt(bufferRead.readLine()));
+        Set<Client> filtered = clientController.filterClientsWithNameLessThan(Integer.parseInt(bufferRead.readLine()));
+        filtered.forEach(System.out::println);
     }
 
 

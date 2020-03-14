@@ -4,6 +4,7 @@ package Controller;
         import Entities.Validators.ClientValidator;
         import Entities.Validators.ValidatorException;
         import Repository.Repository;
+        import Repository.ClientFileRepository;
 
         import java.util.Optional;
         import java.util.Set;
@@ -21,6 +22,7 @@ public class ClientController {
         this.repo=initRepo;
         validator = new ClientValidator();
     }
+
 
     public Optional<Client> getById(Integer clientId)
     {
@@ -56,25 +58,24 @@ public class ClientController {
         }
     }
 
-    public void filterOddId()
+    public Set<Client> filterOddId()
     {
-        for (Client client: repo.findAll())
-        {
-            if(client.getId()%2!=0)
-                repo.delete(client.getId());
-        }
+
+        Set<Client> all = (Set<Client>) repo.findAll();
+        all.removeIf(client->client.getId()%2!=0);
+
+        return all;
     }
 
     /*
     filters clients that have the name length less than some number
      */
 
-    public void filterClientsWithNameLessThan(int length)
+    public Set<Client> filterClientsWithNameLessThan(int length)
     {
-        for(Client client: repo.findAll())
-        {
-            if(client.getName().length() < length)
-                repo.delete(client.getId());
-        }
+        Set<Client> all = (Set<Client>) repo.findAll();
+        all.removeIf(client->client.getName().length() < length);
+
+        return all;
     }
 }
