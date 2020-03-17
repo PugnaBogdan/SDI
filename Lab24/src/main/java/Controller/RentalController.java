@@ -59,24 +59,33 @@ public class RentalController {
         }
     }
 
-    public HashSet<Integer> getMostActiveClient()
+    public List<Integer> getMostActiveClient()
     {
+
         Map<Integer, Integer> mostActive = mostActiveClient.entrySet()
                 .stream()
-                .sorted(Map.Entry.<Integer, Integer>comparingByValue())
+                .sorted((a,b)->a.getValue().compareTo(b.getValue()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        return (HashSet<Integer>)mostActive.values();
+
+
+        System.out.println(mostActive);
+
+        List<Integer> al = new ArrayList<Integer>(mostActive.keySet());
+
+        return al;
     }
 
-    public HashSet<Integer> getMostRentedMovie()
+    public List<Integer> getMostRentedMovie()
     {
         Map<Integer, Integer> mostRented = mostRentedMovie.entrySet()
                 .stream()
                 .sorted(Map.Entry.<Integer, Integer>comparingByValue())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        return (HashSet<Integer>)mostRented.values();
+        List<Integer> al = new ArrayList<Integer>(mostRented.keySet());
+
+        return al;
 
     }
 
@@ -89,14 +98,20 @@ public class RentalController {
     {
         int clientKey = rentalToAdd.getClientId();
         int movieKey = rentalToAdd.getMovieId();
-
+        int clientAmount=0,movieAmount=0;
         if(mostActiveClient.containsKey(clientKey))
-            mostActiveClient.replace(clientKey,mostActiveClient.get(clientKey)+1);
+        {
+            clientAmount = mostActiveClient.get(clientKey);
+            mostActiveClient.replace(clientKey, clientAmount + 1);
+        }
         else
             mostActiveClient.putIfAbsent(clientKey,1);
 
         if(mostRentedMovie.containsKey(movieKey))
-            mostRentedMovie.replace(movieKey,mostRentedMovie.get(movieKey)+1);
+        {
+            movieAmount = mostRentedMovie.get(movieKey);
+            mostRentedMovie.replace(movieKey, movieAmount + 1);
+        }
         else
             mostRentedMovie.putIfAbsent(movieKey,1);
 
