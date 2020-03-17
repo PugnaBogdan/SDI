@@ -138,9 +138,9 @@ public class MovieXMLRepository  extends InMemoryRepository<Integer, Movie>   {
 
         Element root = document.createElement("MovieRep");
         document.appendChild(root);
-        super.findAll().forEach(Client -> {
-            Node child = movieToNode(Client,document);
-            root.appendChild(child);
+        super.findAll().forEach(Movie -> {
+            Node movie = movieToNode(Movie,document);
+            root.appendChild(movie);
         });
 
         Transformer transformer = TransformerFactory.

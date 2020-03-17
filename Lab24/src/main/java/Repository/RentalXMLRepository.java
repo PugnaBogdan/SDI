@@ -139,9 +139,9 @@ public class RentalXMLRepository extends InMemoryRepository<Integer, RentAction>
 
         Element root = document.createElement("RentRep");
         document.appendChild(root);
-        super.findAll().forEach(Client -> {
-            Node child = rentToNode(Client,document);
-            root.appendChild(child);
+        super.findAll().forEach(rentAction -> {
+            Node rent = rentToNode(rentAction,document);
+            root.appendChild(rent);
         });
 
         Transformer transformer = TransformerFactory.

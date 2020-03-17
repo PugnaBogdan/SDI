@@ -55,9 +55,6 @@ public class RentalController {
             if(!m.isPresent())
                 throw new ValidatorException("Movie does not exist");
 
-            for(RentAction rent : repo.findAll())
-                if(rent.getMovieId()==rentalToAdd.getMovieId())
-                    throw new RentalException("Movie already rented!");
             validator.validate(rentalToAdd);
 
             repo.save(rentalToAdd);
@@ -182,6 +179,24 @@ public class RentalController {
         } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
             e.printStackTrace();
         }
+    }
+
+    public void deleteRentByClient(Integer clientId) throws ValidatorException{
+        Iterable<RentAction> rentals = repo.findAll();
+        rentals.forEach(Rent->{
+            if(Rent.getClientId() == clientId){
+                this.deleteRent(Rent.getRentId());
+            }
+        });
+    }
+
+    public void deleteRentByMovie(Integer movieId) throws ValidatorException{
+        Iterable<RentAction> rentals = repo.findAll();
+        rentals.forEach(Rent->{
+            if(Rent.getMovieId() == movieId){
+                this.deleteRent(Rent.getRentId());
+            }
+        });
     }
 
 }

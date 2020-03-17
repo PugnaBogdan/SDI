@@ -5,11 +5,7 @@
 <MovieId>1</MovieId>
 </Rent>
 <Rent Id="2">
-<ClientId>1</ClientId>
-<MovieId>2</MovieId>
-</Rent>
-<Rent Id="3">
-<ClientId>1</ClientId>
-<MovieId>3</MovieId>
+<ClientId>2</ClientId>
+<MovieId>1</MovieId>
 </Rent>
 </RentRep>
