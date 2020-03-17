@@ -13,6 +13,7 @@ package Repository;
         import java.util.Arrays;
         import java.util.List;
         import java.util.Optional;
+        import java.util.Set;
 
 /**
  * @author Pugna
@@ -24,7 +25,6 @@ public class ClientFileRepository extends InMemoryRepository<Integer, Client> {
     public ClientFileRepository( String fileName) {
 
         this.fileName = fileName;
-
         loadData();
     }
     private void loadData() {
@@ -34,8 +34,9 @@ public class ClientFileRepository extends InMemoryRepository<Integer, Client> {
             Files.lines(path).forEach(line -> {
                 List<String> items = Arrays.asList(line.split(","));
 
-                Integer id = Integer.valueOf(items.get(0));
-                String name = items.get((1));
+
+                int id = Integer.parseInt(items.get(0));
+                String name = items.get(1);
                 int age = Integer.parseInt(items.get(2));
 
                 Client client = new Client(id, name, age);
@@ -56,10 +57,24 @@ public class ClientFileRepository extends InMemoryRepository<Integer, Client> {
     public Optional<Client> save(Client entity) throws ValidatorException {
         Optional<Client> optional = super.save(entity);
         if (optional.isPresent()) {
-            throw new ValidatorException("already in ID!");
+            throw new ValidatorException("Client already exists!");
 
         }
         saveToFile(entity);
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Client> delete(Integer integer) {
+        Optional<Client> optional = super.delete(integer);
+        redoFile();
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Client> update(Client entity) {
+        super.update(entity);
+        redoFile();
         return Optional.empty();
     }
 
@@ -68,10 +83,33 @@ public class ClientFileRepository extends InMemoryRepository<Integer, Client> {
 
         try (BufferedWriter bufferedWriter = Files.newBufferedWriter(path, StandardOpenOption.APPEND)) {
             bufferedWriter.write(
-                    entity.getId() + "," + entity.getName() + "," + entity.getAge()+ "\n");
+                    Integer.toString(entity.getId()) + "," + entity.getName() + "," + Integer.toString(entity.getAge()));
             bufferedWriter.newLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+
+    private void redoFile()
+    {
+        Path path = Paths.get(fileName);
+
+        Set<Client> clients = (Set<Client>) super.findAll();
+        try (BufferedWriter bufferedWriter = Files.newBufferedWriter(path)) {
+        clients.forEach(entity ->{
+            try {
+                bufferedWriter.write(
+                        Integer.toString(entity.getId()) + "," + entity.getName() + "," + Integer.toString(entity.getAge()));
+                bufferedWriter.newLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

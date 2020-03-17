@@ -49,25 +49,24 @@ public class MovieController {
         }
     }
 
-    public void filterEvenId()
+    public Set<Movie> filterEvenId()
     {
-        for (Movie movie: repo.findAll())
-        {
-            if(movie.getId()%2==0)
-                repo.delete(movie.getId());
-        }
+        Set<Movie> all = (Set<Movie>) repo.findAll();
+        all.removeIf(movie->movie.getId()%2==0);
+
+        return all;
     }
 
     /*
     filters movies that have the title length less than some number
      */
 
-    public void filterMoviesWithTitleLessThan(int length)
+    public Set<Movie> filterMoviesWithTitleLessThan(int length)
     {
-        for(Movie movie: repo.findAll())
-        {
-            if(movie.getTitle().length() < length)
-                repo.delete(movie.getId());
-        }
+
+        Set<Movie> all = (Set<Movie>) repo.findAll();
+        all.removeIf(movie->movie.getTitle().length() < length);
+
+        return all;
     }
 }
