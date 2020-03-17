@@ -15,6 +15,10 @@ package Ui;
         import java.io.BufferedReader;
         import java.io.IOException;
         import java.io.InputStreamReader;
+        import java.util.Collection;
+        import java.util.List;
+        import java.util.Map;
+
         import java.util.Set;
 
 /**
@@ -114,15 +118,15 @@ public class UserInterface {
 
     private void getReports() {
 
-        Set<Integer> mostActive = (Set<Integer>) rentalController.getMostActiveClient();
-        System.out.println("The most active client is:" + Integer.toString((Integer) mostActive.toArray()[0]));
+        List<Integer> mostActive = (List<Integer>) rentalController.getMostActiveClient();
+        System.out.println("The most active client is:" + Integer.toString((Integer) mostActive.get(mostActive.size()-1)));
 
-        Set<Integer> mostRented = (Set<Integer>) rentalController.getMostRentedMovie();
-        System.out.println("The most rented movie is:" + Integer.toString((Integer) mostRented.toArray()[0]));
+        List<Integer> mostRented = (List<Integer>) rentalController.getMostRentedMovie();
+        System.out.println("The most rented movie is:" + Integer.toString((Integer) mostRented.get(mostRented.size()-1)));
 
-        Set<Integer> repeatedRentals = (Set<Integer>) rentalController.getRepeatedRentals().values();
+        Map<Integer,Integer> repeatedRentals =  rentalController.getRepeatedRentals();
         System.out.println("The repeated rentals are:");
-        repeatedRentals.forEach(System.out::println);
+        System.out.println(repeatedRentals);
 
     }
 
