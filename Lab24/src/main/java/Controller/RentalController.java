@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class RentalController {
@@ -23,6 +24,9 @@ public class RentalController {
     private RentValidator validator;
     private ClientController clientController;
     private MovieController movieController;
+    private HashMap<Integer,Integer> mostRentedMovie = new HashMap<Integer,Integer>();
+    private HashMap<Integer,Integer> mostActiveClient = new HashMap<Integer,Integer>();
+    private HashMap<Integer,Integer> repeatedRentals = new HashMap<Integer,Integer>();
 
     public RentalController(Repository<Integer, RentAction> repo, ClientController initClientController,MovieController initMovieController) {
         this.repo = repo;
@@ -38,8 +42,6 @@ public class RentalController {
 
     public void addRental(RentAction rentalToAdd) throws ValidatorException {
         try {
-
-
 
             int clientID = rentalToAdd.getClientId();
             int movieID = rentalToAdd.getMovieId();
@@ -58,11 +60,59 @@ public class RentalController {
                     throw new RentalException("Movie already rented!");
             validator.validate(rentalToAdd);
             repo.save(rentalToAdd);
+            updateReports(rentalToAdd);
         } catch (ValidatorException v) {
             throw new ValidatorException(v.getMessage());
         } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
             e.printStackTrace();
         }
+    }
+
+    public HashSet<Integer> getMostActiveClient()
+    {
+        Map<Integer, Integer> mostActive = mostActiveClient.entrySet()
+                .stream()
+                .sorted(Map.Entry.<Integer, Integer>comparingByValue())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        return (HashSet<Integer>)mostActive.values();
+    }
+
+    public HashSet<Integer> getMostRentedMovie()
+    {
+        Map<Integer, Integer> mostRented = mostRentedMovie.entrySet()
+                .stream()
+                .sorted(Map.Entry.<Integer, Integer>comparingByValue())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        return (HashSet<Integer>)mostRented.values();
+
+    }
+
+    public HashMap<Integer,Integer> getRepeatedRentals()
+    {
+        return this.repeatedRentals;
+    }
+
+    private void updateReports(RentAction rentalToAdd)
+    {
+        int clientKey = rentalToAdd.getClientId();
+        int movieKey = rentalToAdd.getMovieId();
+
+        if(mostActiveClient.containsKey(clientKey))
+            mostActiveClient.replace(clientKey,mostActiveClient.get(clientKey)+1);
+        else
+            mostActiveClient.putIfAbsent(clientKey,1);
+
+        if(mostRentedMovie.containsKey(movieKey))
+            mostRentedMovie.replace(movieKey,mostRentedMovie.get(movieKey)+1);
+        else
+            mostRentedMovie.putIfAbsent(movieKey,1);
+
+        if(repeatedRentals.containsKey(rentalToAdd.getRentId()))
+            repeatedRentals.replace(rentalToAdd.getRentId(),repeatedRentals.get(rentalToAdd.getRentId())+1);
+        else
+            repeatedRentals.putIfAbsent(rentalToAdd.getRentId(),1);
     }
 
     public void deleteRent(Integer rentToDelete) throws ValidatorException{

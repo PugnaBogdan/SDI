@@ -14,6 +14,8 @@ package Ui;
         import java.io.BufferedReader;
         import java.io.IOException;
         import java.io.InputStreamReader;
+        import java.util.Collection;
+        import java.util.Map;
         import java.util.Set;
 
 /**
@@ -49,6 +51,7 @@ public class UserInterface {
             System.out.println(" 11 - filter movie by title length");
             System.out.println(" 12 - filter movie by even ID");
             System.out.println(" 13 - filter client by name length");
+            System.out.println(" 14 - reports");
             System.out.println(" 0 - exit");
             System.out.println("Input command: ");
             BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
@@ -94,6 +97,10 @@ public class UserInterface {
                 else if(command ==13){
                     filterClientByNameLength();
                 }
+                else if(command ==14)
+                {
+                    getReports();
+                }
                 else break;
 
             } catch (IOException ex) {
@@ -101,6 +108,20 @@ public class UserInterface {
             }
 
         }
+    }
+
+    private void getReports() {
+
+        Set<Integer> mostActive = (Set<Integer>) rentalController.getMostActiveClient();
+        System.out.println("The most active client is:" + Integer.toString((Integer) mostActive.toArray()[0]));
+
+        Set<Integer> mostRented = (Set<Integer>) rentalController.getMostRentedMovie();
+        System.out.println("The most rented movie is:" + Integer.toString((Integer) mostRented.toArray()[0]));
+
+        Set<Integer> repeatedRentals = (Set<Integer>) rentalController.getRepeatedRentals().values();
+        System.out.println("The repeated rentals are:");
+        repeatedRentals.forEach(System.out::println);
+
     }
 
     private void printAllClients() {
@@ -160,7 +181,6 @@ public class UserInterface {
             String name = bufferRead.readLine();
             int age = Integer.parseInt(bufferRead.readLine());// ...
             Client client = new Client(id, name, age);
-
 
             return client;
         } catch (IOException ex) {
