@@ -8,4 +8,8 @@
 <ClientId>2</ClientId>
 <MovieId>1</MovieId>
 </Rent>
+<Rent Id="3">
+<ClientId>3</ClientId>
+<MovieId>2</MovieId>
+</Rent>
 </RentRep>

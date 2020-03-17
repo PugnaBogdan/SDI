@@ -41,8 +41,8 @@ public class Main {
         Repository<Integer, Movie> movieFileRepository = new MovieXMLRepository("D:\\anul2_sem2\\mpp\\SDI\\Lab24\\src\\main\\resources\\MovieRep.xml");
         Repository<Integer, RentAction> rentalXMLRepository = new RentalXMLRepository("D:\\anul2_sem2\\mpp\\SDI\\Lab24\\src\\main\\resources\\RentRep.xml");
 
-        ClientController clientController = new ClientController(clientRepository);
-        MovieController movieController = new MovieController(movieFileRepository);
+        ClientController clientController = new ClientController(clientRepository, rentalXMLRepository);
+        MovieController movieController = new MovieController(movieFileRepository, rentalXMLRepository);
         RentalController rentalController = new RentalController(rentalXMLRepository, clientController, movieController);
         UserInterface ui = new UserInterface(clientController, movieController, rentalController);
         ui.runConsole();

@@ -1,6 +1,7 @@
 package Repository;
 
         import Entities.BaseEntity;
+        import Entities.RentAction;
         import Entities.Validators.Validator;
         import Entities.Validators.ValidatorException;
         import org.xml.sax.SAXException;
@@ -69,4 +70,16 @@ public class InMemoryRepository<ID,T extends BaseEntity<ID>> implements Reposito
         }
         return Optional.ofNullable(objects.computeIfPresent(entity.getId(), (k, v) -> entity));
     }
+
+    @Override
+    public void deleteRentByClient(ID clientToDelete) {
+
+    }
+
+    @Override
+    public void deleteRentByMovie(ID movieToDelete) {
+
+    }
+
+
 }

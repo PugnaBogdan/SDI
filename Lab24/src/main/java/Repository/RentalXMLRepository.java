@@ -116,6 +116,32 @@ public class RentalXMLRepository extends InMemoryRepository<Integer, RentAction>
         return Optional.empty();
     }
 
+    public void deleteRentByClient(Integer clientId) throws ValidatorException{
+        Iterable<RentAction> rentals = super.findAll();
+        rentals.forEach(Rent->{
+            if(Rent.getClientId() == clientId){
+                try {
+                    this.delete(Rent.getRentId());
+                } catch (ParserConfigurationException | TransformerException | SAXException | IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public void deleteRentByMovie(Integer movieId) throws ValidatorException{
+        Iterable<RentAction> rentals = super.findAll();
+        rentals.forEach(Rent->{
+            if(Rent.getMovieId() == movieId){
+                try {
+                    this.delete(Rent.getRentId());
+                } catch (ParserConfigurationException | TransformerException | SAXException | IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
     @Override
     public Optional<RentAction> delete(Integer integer) throws ParserConfigurationException, TransformerException, SAXException, IOException {
         Optional<RentAction> optional = super.delete(integer);

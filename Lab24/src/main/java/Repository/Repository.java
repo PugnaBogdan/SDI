@@ -70,4 +70,7 @@ public interface Repository<ID, T extends BaseEntity<ID>> {
      *             if the entity is not valid.
      */
     Optional<T> update(T entity) throws ValidatorException, ParserConfigurationException, TransformerException, SAXException, IOException;
+
+    void deleteRentByClient(ID clientToDelete);
+    void deleteRentByMovie(ID movieToDelete);
 }

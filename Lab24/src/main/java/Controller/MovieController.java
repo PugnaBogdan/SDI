@@ -2,6 +2,7 @@ package Controller;
 
         import Entities.Client;
         import Entities.Movie;
+        import Entities.RentAction;
         import Entities.Validators.MovieValidator;
         import Entities.Validators.ValidatorException;
         import Repository.Repository;
@@ -19,10 +20,12 @@ package Controller;
 public class MovieController {
 
     private Repository<Integer, Movie> repo;
+    private Repository<Integer, RentAction> repoRent;
     private MovieValidator validator;
 
-    public MovieController(Repository<Integer, Movie> initRepo) {
+    public MovieController(Repository<Integer, Movie> initRepo, Repository<Integer, RentAction> rentalXMLRepository) {
         repo = initRepo;
+        repoRent = rentalXMLRepository;
         validator = new MovieValidator();
     }
 
@@ -50,6 +53,7 @@ public class MovieController {
     public void deleteMovie(Integer movieToDelete) throws ValidatorException{
         try{
             repo.delete(movieToDelete);
+            repoRent.deleteRentByMovie(movieToDelete);
         }
         catch (ValidatorException v){
             throw  new ValidatorException((v.getMessage()));

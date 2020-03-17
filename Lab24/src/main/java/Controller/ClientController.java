@@ -1,10 +1,13 @@
 package Controller;
 
         import Entities.Client;
+        import Entities.RentAction;
         import Entities.Validators.ClientValidator;
         import Entities.Validators.ValidatorException;
         import Repository.Repository;
+        import Controller.RentalController;
         import Repository.ClientFileRepository;
+        import Repository.RentalXMLRepository;
         import org.xml.sax.SAXException;
 
         import javax.xml.parsers.ParserConfigurationException;
@@ -19,13 +22,16 @@ package Controller;
 public class ClientController {
 
     private Repository<Integer, Client> repo;
+    private Repository<Integer, RentAction> repoRent;
     private ClientValidator validator;
 
-    public ClientController(Repository<Integer,Client> initRepo)
+    public ClientController(Repository<Integer, Client> initRepo, Repository<Integer, RentAction> rentalXMLRepository)
     {
         this.repo=initRepo;
+        this.repoRent = rentalXMLRepository;
         validator = new ClientValidator();
     }
+
 
 
     public Optional<Client> getById(Integer clientId)
@@ -55,6 +61,7 @@ public class ClientController {
     public void deleteClient(Integer clientToDelete) throws ValidatorException{
         try{
             repo.delete(clientToDelete);
+            repoRent.deleteRentByClient(clientToDelete);
         }
         catch (ValidatorException v){
             throw  new ValidatorException((v.getMessage()));

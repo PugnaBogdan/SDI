@@ -138,8 +138,7 @@ public class RentalController {
     public void updateTheReports()
     {
         Set<RentAction> rents = (Set<RentAction>) repo.findAll();
-        for(RentAction r: rents)
-            updateReports(r);
+        rents.forEach(this::updateReports);
     }
 
     private void updateReports(RentAction rentalToAdd)
@@ -181,22 +180,6 @@ public class RentalController {
         }
     }
 
-    public void deleteRentByClient(Integer clientId) throws ValidatorException{
-        Iterable<RentAction> rentals = repo.findAll();
-        rentals.forEach(Rent->{
-            if(Rent.getClientId() == clientId){
-                this.deleteRent(Rent.getRentId());
-            }
-        });
-    }
 
-    public void deleteRentByMovie(Integer movieId) throws ValidatorException{
-        Iterable<RentAction> rentals = repo.findAll();
-        rentals.forEach(Rent->{
-            if(Rent.getMovieId() == movieId){
-                this.deleteRent(Rent.getRentId());
-            }
-        });
-    }
 
 }
