@@ -126,8 +126,8 @@ public class UserInterface {
         List<Integer> mostRented = (List<Integer>) rentalController.getMostRentedMovie();
         System.out.println("The most rented movie is:" + Integer.toString((Integer) mostRented.get(mostRented.size()-1)));
 
-        Map<Integer,Integer> repeatedRentals =  rentalController.getRepeatedRentals();
-        System.out.println("The repeated rentals are:");
+        List<Integer> repeatedRentals =  rentalController.getRentedMoviesOfMostActiveClient();
+        System.out.println("The movies of the most active client are:");
         System.out.println(repeatedRentals);
 
     }

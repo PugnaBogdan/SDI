@@ -28,7 +28,7 @@ public class RentalController {
     private MovieController movieController;
     private HashMap<Integer,Integer> mostRentedMovie = new HashMap<Integer,Integer>();
     private HashMap<Integer,Integer> mostActiveClient = new HashMap<Integer,Integer>();
-    private HashMap<Integer,Integer> repeatedRentals = new HashMap<Integer,Integer>();
+    private ArrayList<Integer> rentalOfMostActive = new ArrayList<Integer>();
 
     public RentalController(Repository<Integer, RentAction> repo, ClientController initClientController,MovieController initMovieController) {
         this.repo = repo;
@@ -111,9 +111,7 @@ public class RentalController {
 
         System.out.println(mostActive);
 
-        List<Integer> al = new ArrayList<>(mostActive.keySet());
-
-        return al;
+        return new ArrayList<>(mostActive.keySet());
     }
 
     public List<Integer> getMostRentedMovie()
@@ -126,19 +124,27 @@ public class RentalController {
 
         System.out.println(mostRented);
 
-        List<Integer> al = new ArrayList<>(mostRented.keySet());
-
-        return al;
+        return new ArrayList<>(mostRented.keySet());
 
     }
 
-    public HashMap<Integer,Integer> getRepeatedRentals()
+    public List<Integer> getRentedMoviesOfMostActiveClient()
     {
-        return this.repeatedRentals;
+        List<Integer> mostActive = getMostActiveClient();
+        int clientId = mostActive.get(mostActive.size()-1);
+        Set<Integer> all =  ((Set<RentAction>)repo.findAll()).stream()
+                .filter(e->e.getClientId()==clientId)
+                .map(RentAction::getMovieId)
+                .collect(Collectors.toSet());
+
+        return new ArrayList<Integer>(all);
     }
 
     public void updateTheReports()
     {
+        mostRentedMovie = new HashMap<Integer,Integer>();
+        mostActiveClient = new HashMap<Integer,Integer>();
+        rentalOfMostActive = new ArrayList<Integer>();
         Set<RentAction> rents = (Set<RentAction>) repo.findAll();
         rents.forEach(this::updateReports);
     }
@@ -164,10 +170,7 @@ public class RentalController {
         else
             mostRentedMovie.putIfAbsent(movieKey,1);
 
-        if(repeatedRentals.containsKey(rentalToAdd.getRentId()))
-            repeatedRentals.replace(rentalToAdd.getRentId(),repeatedRentals.get(rentalToAdd.getRentId())+1);
-        else
-            repeatedRentals.putIfAbsent(rentalToAdd.getRentId(),0);
+         rentalOfMostActive = (ArrayList<Integer>) getRentedMoviesOfMostActiveClient();
     }
 
 
