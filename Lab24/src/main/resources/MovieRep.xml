@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<MovieRep>
+
+<Movie Id="1">
+<Title>dasd</Title>
+<Price>23</Price>
+</Movie>
+<Movie Id="2">
+<Title>asdas</Title>
+<Price>3</Price>
+</Movie>
+<Movie Id="3">
+<Title>adsad</Title>
+<Price>4</Price>
+</Movie>
+</MovieRep>

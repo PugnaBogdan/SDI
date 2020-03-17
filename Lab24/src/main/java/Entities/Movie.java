@@ -17,11 +17,16 @@ public class Movie extends BaseEntity<Integer> {
         this.price = initPrice;
     }
 
+    public Movie() {
+
+    }
+
     @Override
     public String toString() {
         return "Movie{" +
-                "title='" + title + '\'' +
-                ", movieId=" + movieId +
+                "movieId=" + movieId +
+                ", title='" + title + '\'' +
+
                 ", price=" + price +
                 '}';
     }

@@ -34,7 +34,7 @@ public class MovieTest {
 
     @Test
     public void TestNewId() throws Exception {
-        movie.setMovieIdId(NEW_ID);
+        movie.setMovieId(NEW_ID);
         assertEquals("Serial numbers should be equal", NEW_ID, movie.getId());
     }
 

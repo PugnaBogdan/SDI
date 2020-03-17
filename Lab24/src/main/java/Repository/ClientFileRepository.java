@@ -3,7 +3,10 @@ package Repository;
         import Entities.Client;
         import Entities.Validators.Validator;
         import Entities.Validators.ValidatorException;
+        import org.xml.sax.SAXException;
 
+        import javax.xml.parsers.ParserConfigurationException;
+        import javax.xml.transform.TransformerException;
         import java.io.BufferedWriter;
         import java.io.IOException;
         import java.nio.file.Files;
@@ -44,7 +47,7 @@ public class ClientFileRepository extends InMemoryRepository<Integer, Client> {
 
                 try {
                     super.save(client);
-                } catch (ValidatorException e) {
+                } catch (ValidatorException | IOException | ParserConfigurationException | SAXException | TransformerException e) {
                     e.printStackTrace();
                 }
             });
@@ -54,7 +57,7 @@ public class ClientFileRepository extends InMemoryRepository<Integer, Client> {
     }
 
     @Override
-    public Optional<Client> save(Client entity) throws ValidatorException {
+    public Optional<Client> save(Client entity) throws ValidatorException, ParserConfigurationException, IOException, SAXException, TransformerException {
         Optional<Client> optional = super.save(entity);
         if (optional.isPresent()) {
             throw new ValidatorException("Client already exists!");
@@ -65,14 +68,14 @@ public class ClientFileRepository extends InMemoryRepository<Integer, Client> {
     }
 
     @Override
-    public Optional<Client> delete(Integer integer) {
+    public Optional<Client> delete(Integer integer) throws ParserConfigurationException, IOException, SAXException, TransformerException {
         Optional<Client> optional = super.delete(integer);
         redoFile();
         return Optional.empty();
     }
 
     @Override
-    public Optional<Client> update(Client entity) {
+    public Optional<Client> update(Client entity) throws ParserConfigurationException, IOException, SAXException, TransformerException {
         super.update(entity);
         redoFile();
         return Optional.empty();

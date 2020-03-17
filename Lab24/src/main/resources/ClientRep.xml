@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<ClientRep>
+<Client Id="1">
+<Name>Bogdan</Name>
+<Age>21</Age>
+</Client>
+<Client Id="2">
+<Name>sadas</Name>
+<Age>23</Age>
+</Client>
+<Client Id="3">
+<Name>dsada</Name>
+<Age>2</Age>
+</Client>
+</ClientRep>

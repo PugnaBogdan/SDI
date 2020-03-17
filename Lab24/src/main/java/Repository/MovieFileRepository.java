@@ -3,7 +3,10 @@ package Repository;
 import Entities.Client;
 import Entities.Movie;
 import Entities.Validators.ValidatorException;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -51,7 +54,7 @@ public class MovieFileRepository extends InMemoryRepository<Integer, Movie> {
                 {
                     super.save(movie);
                 }
-                catch(ValidatorException e)
+                catch(ValidatorException | ParserConfigurationException | TransformerException | SAXException | IOException e)
                 {
                     e.printStackTrace();
                 }
@@ -62,8 +65,7 @@ public class MovieFileRepository extends InMemoryRepository<Integer, Movie> {
         }
     }
 
-    public Optional<Movie> save(Movie movie) throws ValidatorException
-    {
+    public Optional<Movie> save(Movie movie) throws ValidatorException, ParserConfigurationException, IOException, SAXException, TransformerException {
         Optional<Movie> optional = super.save(movie);
 
         if(optional.isPresent())
@@ -75,14 +77,14 @@ public class MovieFileRepository extends InMemoryRepository<Integer, Movie> {
     }
 
     @Override
-    public Optional<Movie> delete(Integer integer) {
+    public Optional<Movie> delete(Integer integer) throws ParserConfigurationException, IOException, SAXException, TransformerException {
         Optional<Movie> optional = super.delete(integer);
         redoFile();
         return Optional.empty();
     }
 
     @Override
-    public Optional<Movie> update(Movie entity) {
+    public Optional<Movie> update(Movie entity) throws ParserConfigurationException, IOException, SAXException, TransformerException {
         super.update(entity);
         redoFile();
         return Optional.empty();

@@ -7,7 +7,14 @@ import Entities.Validators.RentValidator;
 import Entities.Validators.RentalException;
 import Entities.Validators.ValidatorException;
 import Repository.Repository;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Optional;
+import java.util.Set;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,40 +59,65 @@ public class RentalController {
                 if(rent.getMovieId()==rentalToAdd.getMovieId())
                     throw new RentalException("Movie already rented!");
             validator.validate(rentalToAdd);
+
             repo.save(rentalToAdd);
             updateReports(rentalToAdd);
+
         } catch (ValidatorException v) {
-            throw new ValidatorException(v.getMessage());
+            throw new ValidatorException(v.getMessage());}
+        catch (RentalException r){
+            throw new RentalException(r.getMessage());
+        } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
+            e.printStackTrace();
         }
     }
 
-    public List<Integer> getMostActiveClient()
-    {
+    public void updateRental(RentAction rent) {
+        try{
 
-        Map<Integer, Integer> mostActive = mostActiveClient.entrySet()
-                .stream()
-                .sorted((a,b)->a.getValue().compareTo(b.getValue()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            int clientID = rent.getClientId();
+            int movieID = rent.getMovieId();
 
+            Optional<Client> c = clientController.getById(clientID);
+            Optional<Movie> m = movieController.getById(movieID);
 
+            if(!c.isPresent())
+                throw new ValidatorException("Client does not exist");
 
-        System.out.println(mostActive);
+            if(!m.isPresent())
+                throw new ValidatorException("Movie does not exist");
 
-        List<Integer> al = new ArrayList<Integer>(mostActive.keySet());
+            validator.validate(rent);
+            repo.update(rent);
+            updateReports(rent);
 
-        return al;
+        } catch (ValidatorException v) {
+            throw new ValidatorException(v.getMessage());}
+        catch (RentalException r){
+                throw new RentalException(r.getMessage());
+        } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
+            e.printStackTrace();
+        }
     }
 
-    public List<Integer> getMostRentedMovie()
+    public HashSet<Integer> getMostActiveClient()
+    {
+        Map<Integer, Integer> mostActive = mostActiveClient.entrySet()
+                .stream()
+                .sorted(Map.Entry.<Integer, Integer>comparingByValue())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        return (HashSet<Integer>)mostActive.values();
+    }
+
+    public HashSet<Integer> getMostRentedMovie()
     {
         Map<Integer, Integer> mostRented = mostRentedMovie.entrySet()
                 .stream()
                 .sorted(Map.Entry.<Integer, Integer>comparingByValue())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        List<Integer> al = new ArrayList<Integer>(mostRented.keySet());
-
-        return al;
+        return (HashSet<Integer>)mostRented.values();
 
     }
 
@@ -98,20 +130,14 @@ public class RentalController {
     {
         int clientKey = rentalToAdd.getClientId();
         int movieKey = rentalToAdd.getMovieId();
-        int clientAmount=0,movieAmount=0;
+
         if(mostActiveClient.containsKey(clientKey))
-        {
-            clientAmount = mostActiveClient.get(clientKey);
-            mostActiveClient.replace(clientKey, clientAmount + 1);
-        }
+            mostActiveClient.replace(clientKey,mostActiveClient.get(clientKey)+1);
         else
             mostActiveClient.putIfAbsent(clientKey,1);
 
         if(mostRentedMovie.containsKey(movieKey))
-        {
-            movieAmount = mostRentedMovie.get(movieKey);
-            mostRentedMovie.replace(movieKey, movieAmount + 1);
-        }
+            mostRentedMovie.replace(movieKey,mostRentedMovie.get(movieKey)+1);
         else
             mostRentedMovie.putIfAbsent(movieKey,1);
 
@@ -127,6 +153,8 @@ public class RentalController {
         }
         catch (ValidatorException v){
             throw  new ValidatorException((v.getMessage()));
+        } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
+            e.printStackTrace();
         }
     }
 
