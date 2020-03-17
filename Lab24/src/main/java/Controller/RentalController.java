@@ -122,8 +122,10 @@ public class RentalController {
     {
         Map<Integer, Integer> mostRented = mostRentedMovie.entrySet()
                 .stream()
-                .sorted(Map.Entry.<Integer, Integer>comparingByValue())
+                .sorted((a,b)->a.getValue().compareTo(b.getValue()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        System.out.println(mostRented);
 
         List<Integer> al = new ArrayList<Integer>(mostRented.keySet());
 
@@ -134,6 +136,13 @@ public class RentalController {
     public HashMap<Integer,Integer> getRepeatedRentals()
     {
         return this.repeatedRentals;
+    }
+
+    public void updateTheReports()
+    {
+        Set<RentAction> rents = (Set<RentAction>) repo.findAll();
+        for(RentAction r: rents)
+            updateReports(r);
     }
 
     private void updateReports(RentAction rentalToAdd)
@@ -160,7 +169,7 @@ public class RentalController {
         if(repeatedRentals.containsKey(rentalToAdd.getRentId()))
             repeatedRentals.replace(rentalToAdd.getRentId(),repeatedRentals.get(rentalToAdd.getRentId())+1);
         else
-            repeatedRentals.putIfAbsent(rentalToAdd.getRentId(),1);
+            repeatedRentals.putIfAbsent(rentalToAdd.getRentId(),0);
     }
 
 
