@@ -7,7 +7,10 @@ package Ui;
         import Entities.Movie;
         import Entities.RentAction;
         import Entities.Validators.ValidatorException;
+        import org.xml.sax.SAXException;
 
+        import javax.xml.parsers.ParserConfigurationException;
+        import javax.xml.transform.TransformerException;
         import java.io.BufferedReader;
         import java.io.IOException;
         import java.io.InputStreamReader;
@@ -122,6 +125,8 @@ public class UserInterface {
             clientController.addClient(client);
         } catch (ValidatorException e) {
             System.out.println(e.getMessage());
+        } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
+            e.printStackTrace();
         }
 
     }

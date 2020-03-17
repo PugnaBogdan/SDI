@@ -16,6 +16,10 @@ public class Client extends BaseEntity<Integer> {
         age=initAge;
     }
 
+    public Client() {
+
+    }
+
     @Override
     public String toString() {
         return "Client{" +

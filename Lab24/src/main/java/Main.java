@@ -10,26 +10,31 @@ import Entities.Validators.RentalValidator;
 import Entities.Validators.Validator;
         import Repository.InMemoryRepository;
         import Repository.ClientFileRepository;
+        import Repository.ClientXMLRepository;
         import Repository.Repository;
         import Repository.MovieFileRepository;
+        import Repository.RentalFileRepository;
         import Ui.UserInterface;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
 
 /**
  * @author Pugna.
  */
 public class Main {
-    public static void main(String args[])
-    {
+    public static void main(String args[]) throws ParserConfigurationException, SAXException, IOException {
         Validator<Movie> movieValidator = new MovieValidator();
         Validator<Client> clientValidator = new ClientValidator();
         Validator<RentAction> rentalValidator = new RentalValidator();
         InMemoryRepository movieRepository = new InMemoryRepository();
-        Repository<Integer, Client> clientRepository = new ClientFileRepository("src/main/resources/ClientRep.txt");
-        Repository<Integer, Movie> movieFileRepository = new MovieFileRepository("src/main/resources/MovieRep.txt");
-        InMemoryRepository rentActionRepository = new InMemoryRepository();
+        Repository<Integer, Client> clientRepository = new ClientXMLRepository("D:\\anul2_sem2\\mpp\\SDI\\Lab24\\src\\main\\resources\\ClientRep.xml");
+        Repository<Integer, Movie> movieFileRepository = new MovieFileRepository("D:\\anul2_sem2\\mpp\\SDI\\Lab24\\src\\main\\resources\\MovieRep.txt");
+        Repository<Integer, RentAction> rentalFileRepository = new RentalFileRepository("D:\\anul2_sem2\\mpp\\SDI\\Lab24\\src\\main\\resources\\RentalRep.txt");
         ClientController clientController = new ClientController(clientRepository);
         MovieController movieController = new MovieController(movieFileRepository);
-        RentalController rentalController = new RentalController(rentActionRepository, clientController, movieController);
+        RentalController rentalController = new RentalController(rentalFileRepository, clientController, movieController);
         UserInterface ui = new UserInterface(clientController, movieController, rentalController);
         ui.runConsole();
     }

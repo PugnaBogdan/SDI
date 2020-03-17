@@ -7,7 +7,11 @@ import Entities.Validators.RentValidator;
 import Entities.Validators.RentalException;
 import Entities.Validators.ValidatorException;
 import Repository.Repository;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
@@ -56,6 +60,8 @@ public class RentalController {
             repo.save(rentalToAdd);
         } catch (ValidatorException v) {
             throw new ValidatorException(v.getMessage());
+        } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
+            e.printStackTrace();
         }
     }
 
@@ -65,6 +71,8 @@ public class RentalController {
         }
         catch (ValidatorException v){
             throw  new ValidatorException((v.getMessage()));
+        } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
+            e.printStackTrace();
         }
     }
 

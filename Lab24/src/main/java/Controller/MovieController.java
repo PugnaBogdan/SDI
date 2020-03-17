@@ -4,7 +4,11 @@ package Controller;
         import Entities.Validators.MovieValidator;
         import Entities.Validators.ValidatorException;
         import Repository.Repository;
+        import org.xml.sax.SAXException;
 
+        import javax.xml.parsers.ParserConfigurationException;
+        import javax.xml.transform.TransformerException;
+        import java.io.IOException;
         import java.util.Optional;
         import java.util.Set;
 
@@ -37,6 +41,8 @@ public class MovieController {
             repo.save(movieToAdd);
         } catch (ValidatorException v) {
             throw new ValidatorException(v.getMessage());
+        } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
+            e.printStackTrace();
         }
     }
 
@@ -46,6 +52,8 @@ public class MovieController {
         }
         catch (ValidatorException v){
             throw  new ValidatorException((v.getMessage()));
+        } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
+            e.printStackTrace();
         }
     }
 

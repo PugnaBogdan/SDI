@@ -5,7 +5,11 @@ package Controller;
         import Entities.Validators.ValidatorException;
         import Repository.Repository;
         import Repository.ClientFileRepository;
+        import org.xml.sax.SAXException;
 
+        import javax.xml.parsers.ParserConfigurationException;
+        import javax.xml.transform.TransformerException;
+        import java.io.IOException;
         import java.util.Optional;
         import java.util.Set;
 
@@ -35,8 +39,7 @@ public class ClientController {
         return (Set<Client>) clients;
     }
 
-    public void addClient(Client clientToSave) throws ValidatorException
-    {
+    public void addClient(Client clientToSave) throws ValidatorException, ParserConfigurationException, IOException, SAXException, TransformerException {
         try
         {
             validator.validate(clientToSave);
@@ -55,6 +58,8 @@ public class ClientController {
         }
         catch (ValidatorException v){
             throw  new ValidatorException((v.getMessage()));
+        } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
+            e.printStackTrace();
         }
     }
 
