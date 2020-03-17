@@ -59,10 +59,42 @@ public class RentalController {
                 if(rent.getMovieId()==rentalToAdd.getMovieId())
                     throw new RentalException("Movie already rented!");
             validator.validate(rentalToAdd);
+
             repo.save(rentalToAdd);
             updateReports(rentalToAdd);
+
         } catch (ValidatorException v) {
-            throw new ValidatorException(v.getMessage());
+            throw new ValidatorException(v.getMessage());}
+        catch (RentalException r){
+            throw new RentalException(r.getMessage());
+        } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateRental(RentAction rent) {
+        try{
+
+            int clientID = rent.getClientId();
+            int movieID = rent.getMovieId();
+
+            Optional<Client> c = clientController.getById(clientID);
+            Optional<Movie> m = movieController.getById(movieID);
+
+            if(!c.isPresent())
+                throw new ValidatorException("Client does not exist");
+
+            if(!m.isPresent())
+                throw new ValidatorException("Movie does not exist");
+
+            validator.validate(rent);
+            repo.update(rent);
+            updateReports(rent);
+
+        } catch (ValidatorException v) {
+            throw new ValidatorException(v.getMessage());}
+        catch (RentalException r){
+                throw new RentalException(r.getMessage());
         } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
             e.printStackTrace();
         }

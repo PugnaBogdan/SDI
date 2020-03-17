@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<RentRep>
+<Rent Id="1">
+<ClientId>1</ClientId>
+<MovieId>1</MovieId>
+</Rent>
+</RentRep>

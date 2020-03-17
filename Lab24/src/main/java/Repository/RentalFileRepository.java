@@ -59,8 +59,7 @@ public class RentalFileRepository extends InMemoryRepository<Integer, RentAction
     public Optional<RentAction> save(RentAction entity) throws ValidatorException, ParserConfigurationException, IOException, SAXException, TransformerException {
         Optional<RentAction> optional = super.save(entity);
         if (optional.isPresent()) {
-            throw new ValidatorException("Client already exists!");
-
+            throw new ValidatorException("Rental already exists!");
         }
         saveToFile(entity);
         return Optional.empty();
@@ -74,7 +73,7 @@ public class RentalFileRepository extends InMemoryRepository<Integer, RentAction
     }
 
     @Override
-    public Optional<RentAction> update(RentAction entity) {
+    public Optional<RentAction> update(RentAction entity) throws ParserConfigurationException, IOException, SAXException, TransformerException {
         super.update(entity);
         redoFile();
         return Optional.empty();

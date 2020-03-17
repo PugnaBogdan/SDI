@@ -63,7 +63,7 @@ public class InMemoryRepository<ID,T extends BaseEntity<ID>> implements Reposito
     }
 
     @Override
-    public Optional<T> update(T entity){
+    public Optional<T> update(T entity) throws ParserConfigurationException, TransformerException, SAXException, IOException {
         if (entity == null) {
             throw new IllegalArgumentException("entity must not be null");
         }

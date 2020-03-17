@@ -75,7 +75,7 @@ public class ClientFileRepository extends InMemoryRepository<Integer, Client> {
     }
 
     @Override
-    public Optional<Client> update(Client entity) {
+    public Optional<Client> update(Client entity) throws ParserConfigurationException, IOException, SAXException, TransformerException {
         super.update(entity);
         redoFile();
         return Optional.empty();

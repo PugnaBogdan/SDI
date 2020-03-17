@@ -17,6 +17,12 @@ public class RentAction extends BaseEntity<Integer> {
         this.movieId = movieId;
     }
 
+    public RentAction() {
+
+    }
+    public Integer getId(){
+        return rentId;
+    }
     public int getRentId() {
         return rentId;
     }

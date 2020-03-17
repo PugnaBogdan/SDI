@@ -6,6 +6,7 @@ package Ui;
         import Entities.Client;
         import Entities.Movie;
         import Entities.RentAction;
+        import Entities.Validators.RentalException;
         import Entities.Validators.ValidatorException;
         import org.xml.sax.SAXException;
 
@@ -14,8 +15,6 @@ package Ui;
         import java.io.BufferedReader;
         import java.io.IOException;
         import java.io.InputStreamReader;
-        import java.util.Collection;
-        import java.util.Map;
         import java.util.Set;
 
 /**
@@ -38,20 +37,14 @@ public class UserInterface {
 
         while (true){
             System.out.println("Commands: ");
-            System.out.println(" 1 - add Client ");
-            System.out.println(" 2 - show Clients");
-            System.out.println(" 3 - delete Client ");
-            System.out.println(" 4 - add Movie ");
-            System.out.println(" 5 - show Movies");
-            System.out.println(" 6 - delete Movie");
-            System.out.println(" 7 - add Rent");
-            System.out.println(" 8 - show Rents");
-            System.out.println(" 9 - delete Rent");
-            System.out.println(" 10 - filter client by odd Id");
-            System.out.println(" 11 - filter movie by title length");
-            System.out.println(" 12 - filter movie by even ID");
-            System.out.println(" 13 - filter client by name length");
-            System.out.println(" 14 - reports");
+            System.out.println(" 1 - add Client |  2 - show Clients | 3 - Update Client | 4 - delete Client");
+            System.out.println(" 5 - add Movie | 6 - show Movies | 7 - Update Movie | 8 - delete Movie");
+            System.out.println(" 9 - add Rent | 10 - show Rents | 11 - Update Rents | 12 - delete Rents");
+            System.out.println(" 13 - filter client by odd Id");
+            System.out.println(" 14 - filter movie by title length");
+            System.out.println(" 15 - filter movie by even ID");
+            System.out.println(" 16 - filter client by name length");
+            System.out.println(" 17 - reports");
             System.out.println(" 0 - exit");
             System.out.println("Input command: ");
             BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
@@ -65,39 +58,48 @@ public class UserInterface {
                     printAllClients();
                 }
                 else if(command ==3){
-                    deleteClient();
+                    updateClient();
                 }
                 else if(command ==4){
-                    addMovie();
+                    deleteClient();
                 }
                 else if(command ==5){
-                    printAllMovies();
+                    addMovie();
                 }
                 else if(command ==6){
-                    deleteMovie();
+                    printAllMovies();
                 }
                 else if(command ==7){
-                    addRent();
+                    updateMovie();
                 }
                 else if(command ==8){
-                    printAllRents();
+                    deleteMovie();
                 }
-                else if(command ==9){
-                    deleteRent();
+                else if(command == 9){
+                    addRent();
                 }
                 else if(command ==10){
-                    filterOddIdClient();
+                    printAllRents();
                 }
                 else if(command ==11){
-                    filterMovieByNameLength();
+                    updateRental();
                 }
                 else if(command ==12){
-                    filterEvenMovie();
+                    deleteRent();
                 }
                 else if(command ==13){
+                    filterOddIdClient();
+                }
+                else if(command ==14){
+                    filterMovieByNameLength();
+                }
+                else if(command ==15){
+                    filterEvenMovie();
+                }
+                else if(command ==16){
                     filterClientByNameLength();
                 }
-                else if(command ==14)
+                else if(command ==17)
                 {
                     getReports();
                 }
@@ -166,7 +168,7 @@ public class UserInterface {
         RentAction rent = readRent();
         try {
             rentalController.addRental(rent);
-        } catch (ValidatorException e) {
+        } catch (RentalException e) {
             System.out.println(e.getMessage());
         }
 
@@ -260,6 +262,61 @@ public class UserInterface {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private Client updateClient(){
+        System.out.println("Read new clients attributes {id, name, age}");
+
+        BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+        try {
+            int id = Integer.parseInt(bufferRead.readLine());// ...
+            String name = bufferRead.readLine();
+            int age = Integer.parseInt(bufferRead.readLine());// ...
+
+            Client newCLient = new Client(id, name, age);
+
+            clientController.updateClient(newCLient);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+
+    }
+    private Movie updateMovie(){
+        System.out.println("Read new movie attributes {id, ClientId, MovieId}");
+
+        BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+        try {
+            int id = Integer.parseInt(bufferRead.readLine());// ...
+            String titel = bufferRead.readLine();
+            int price = Integer.parseInt(bufferRead.readLine());// ...
+            Movie movie = new Movie(id, titel, price);
+
+            movieController.updateMovie(movie);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+
+    }
+    private Client updateRental(){
+        System.out.println("Read new rental {rentId, clientId, movieId}");
+
+        BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+        try {
+            int id = Integer.parseInt(bufferRead.readLine());// ...
+            int id1 = Integer.parseInt(bufferRead.readLine());// ...
+            int id2 = Integer.parseInt(bufferRead.readLine());// ...
+            RentAction rent = new RentAction(id, id1, id2);
+
+            rentalController.updateRental(rent);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (ValidatorException e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+
     }
 
     private void filterOddIdClient()

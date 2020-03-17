@@ -1,5 +1,6 @@
 package Controller;
 
+        import Entities.Client;
         import Entities.Movie;
         import Entities.Validators.MovieValidator;
         import Entities.Validators.ValidatorException;
@@ -52,6 +53,15 @@ public class MovieController {
         }
         catch (ValidatorException v){
             throw  new ValidatorException((v.getMessage()));
+        } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateMovie(Movie updatedMovie) {
+        try{
+            repo.update(updatedMovie);
+
         } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
             e.printStackTrace();
         }

@@ -63,6 +63,15 @@ public class ClientController {
         }
     }
 
+    public void updateClient(Client UpdatedClient) {
+        try{
+            repo.update(UpdatedClient);
+
+        } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
+            e.printStackTrace();
+        }
+    }
+
     public Set<Client> filterOddId()
     {
 

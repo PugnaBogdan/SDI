@@ -84,7 +84,7 @@ public class MovieFileRepository extends InMemoryRepository<Integer, Movie> {
     }
 
     @Override
-    public Optional<Movie> update(Movie entity) {
+    public Optional<Movie> update(Movie entity) throws ParserConfigurationException, IOException, SAXException, TransformerException {
         super.update(entity);
         redoFile();
         return Optional.empty();
