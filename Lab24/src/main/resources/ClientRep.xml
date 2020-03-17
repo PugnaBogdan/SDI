@@ -8,4 +8,12 @@
 <Name>dsada</Name>
 <Age>2</Age>
 </Client>
+<Client Id="1">
+<Name>asdasd</Name>
+<Age>3</Age>
+</Client>
+<Client Id="2">
+<Name>sdasdas</Name>
+<Age>3</Age>
+</Client>
 </ClientRep>

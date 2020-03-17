@@ -18,6 +18,8 @@ import java.util.Set;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toMap;
+
 public class RentalController {
 
     private Repository<Integer, RentAction> repo;
@@ -103,14 +105,13 @@ public class RentalController {
 
         Map<Integer, Integer> mostActive = mostActiveClient.entrySet()
                 .stream()
-                .sorted((a,b)->a.getValue().compareTo(b.getValue()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-
+                .sorted(Map.Entry.comparingByValue())
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
+                        LinkedHashMap::new));
 
         System.out.println(mostActive);
 
-        List<Integer> al = new ArrayList<Integer>(mostActive.keySet());
+        List<Integer> al = new ArrayList<>(mostActive.keySet());
 
         return al;
     }
@@ -119,12 +120,13 @@ public class RentalController {
     {
         Map<Integer, Integer> mostRented = mostRentedMovie.entrySet()
                 .stream()
-                .sorted((a,b)->a.getValue().compareTo(b.getValue()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .sorted(Map.Entry.comparingByValue())
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
+                        LinkedHashMap::new));
 
         System.out.println(mostRented);
 
-        List<Integer> al = new ArrayList<Integer>(mostRented.keySet());
+        List<Integer> al = new ArrayList<>(mostRented.keySet());
 
         return al;
 
