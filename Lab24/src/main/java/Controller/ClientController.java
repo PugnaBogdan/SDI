@@ -61,7 +61,6 @@ public class ClientController {
     public void deleteClient(Integer clientToDelete) throws ValidatorException{
         try{
             repo.delete(clientToDelete);
-            repoRent.deleteRentByClient(clientToDelete);
         }
         catch (ValidatorException v){
             throw  new ValidatorException((v.getMessage()));

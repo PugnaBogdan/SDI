@@ -53,7 +53,6 @@ public class MovieController {
     public void deleteMovie(Integer movieToDelete) throws ValidatorException{
         try{
             repo.delete(movieToDelete);
-            repoRent.deleteRentByMovie(movieToDelete);
         }
         catch (ValidatorException v){
             throw  new ValidatorException((v.getMessage()));

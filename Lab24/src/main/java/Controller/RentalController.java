@@ -180,6 +180,26 @@ public class RentalController {
         }
     }
 
+    public void deleteClient(Integer clientToDelete) throws ValidatorException{
+        clientController.deleteClient(clientToDelete);
+        Iterable<RentAction> rentals = repo.findAll();
+        rentals.forEach(Rent->{
+            if(Rent.getClientId() == clientToDelete){
+                this.deleteRent(Rent.getRentId());
+            }
+        });
+    }
+
+    public void deleteMovie(Integer movieToDelete) throws ValidatorException{
+        movieController.deleteMovie(movieToDelete);
+        Iterable<RentAction> rentals = repo.findAll();
+        rentals.forEach(Rent->{
+            if(Rent.getMovieId() == movieToDelete){
+                this.deleteRent(Rent.getRentId());
+            }
+        });
+    }
+
 
 
 }

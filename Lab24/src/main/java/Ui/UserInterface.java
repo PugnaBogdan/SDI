@@ -242,7 +242,7 @@ public class UserInterface {
 
         try{
             int id = Integer.parseInt(bufferRead.readLine());
-            clientController.deleteClient(id);
+            rentalController.deleteClient(id);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -253,7 +253,7 @@ public class UserInterface {
 
         try{
             int id = Integer.parseInt(bufferRead.readLine());
-            movieController.deleteMovie(id);
+            rentalController.deleteMovie(id);
         } catch (IOException e) {
             e.printStackTrace();
         }

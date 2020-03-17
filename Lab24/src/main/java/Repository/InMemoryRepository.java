@@ -71,15 +71,6 @@ public class InMemoryRepository<ID,T extends BaseEntity<ID>> implements Reposito
         return Optional.ofNullable(objects.computeIfPresent(entity.getId(), (k, v) -> entity));
     }
 
-    @Override
-    public void deleteRentByClient(ID clientToDelete) {
-
-    }
-
-    @Override
-    public void deleteRentByMovie(ID movieToDelete) {
-
-    }
 
 
 }
