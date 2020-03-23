@@ -37,9 +37,9 @@ public class Main {
         //Repository<Integer, Movie> movieFileRepository = new MovieFileRepository("D:\\anul2_sem2\\mpp\\SDI\\Lab24\\src\\main\\resources\\MovieRep.txt");
         //Repository<Integer, RentAction> rentalFileRepository = new RentalFileRepository("D:\\anul2_sem2\\mpp\\SDI\\Lab24\\src\\main\\resources\\RentalRep.txt");
 
-        Repository<Integer, Client> clientRepository = new ClientXMLRepository("src/main/resources/ClientRep.xml");
-        Repository<Integer, Movie> movieFileRepository = new MovieXMLRepository("src/main/resources/MovieRep.xml");
-        Repository<Integer, RentAction> rentalXMLRepository = new RentalXMLRepository("src/main/resources/RentRep.xml");
+        Repository<Integer, Client> clientRepository = new ClientXMLRepository("Lab24/src/main/resources/ClientRep.xml");
+        Repository<Integer, Movie> movieFileRepository = new MovieXMLRepository("Lab24/src/main/resources/MovieRep.xml");
+        Repository<Integer, RentAction> rentalXMLRepository = new RentalXMLRepository("Lab24/src/main/resources/RentRep.xml");
 
         ClientController clientController = new ClientController(clientRepository, rentalXMLRepository);
         MovieController movieController = new MovieController(movieFileRepository, rentalXMLRepository);
