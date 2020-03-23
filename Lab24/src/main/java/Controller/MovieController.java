@@ -11,6 +11,7 @@ package Controller;
         import javax.xml.parsers.ParserConfigurationException;
         import javax.xml.transform.TransformerException;
         import java.io.IOException;
+        import java.sql.SQLException;
         import java.util.Optional;
         import java.util.Set;
 
@@ -20,21 +21,18 @@ package Controller;
 public class MovieController {
 
     private Repository<Integer, Movie> repo;
-    private Repository<Integer, RentAction> repoRent;
     private MovieValidator validator;
 
-    public MovieController(Repository<Integer, Movie> initRepo, Repository<Integer, RentAction> rentalXMLRepository) {
+    public MovieController(Repository<Integer, Movie> initRepo) {
         repo = initRepo;
-        repoRent = rentalXMLRepository;
         validator = new MovieValidator();
     }
 
-    public Optional<Movie> getById(Integer movieId)
-    {
+    public Optional<Movie> getById(Integer movieId) throws SQLException {
         return repo.findOne(movieId);
     }
 
-    public Set<Movie> getAllMovies() {
+    public Set<Movie> getAllMovies() throws SQLException {
         Iterable<Movie> movies = repo.findAll();
         return (Set<Movie>) movies;
     }
@@ -47,6 +45,8 @@ public class MovieController {
             throw new ValidatorException(v.getMessage());
         } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
             e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -56,7 +56,7 @@ public class MovieController {
         }
         catch (ValidatorException v){
             throw  new ValidatorException((v.getMessage()));
-        } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
+        } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
             e.printStackTrace();
         }
     }
@@ -65,13 +65,12 @@ public class MovieController {
         try{
             repo.update(updatedMovie);
 
-        } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
+        } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public Set<Movie> filterEvenId()
-    {
+    public Set<Movie> filterEvenId() throws SQLException {
         Set<Movie> all = (Set<Movie>) repo.findAll();
         all.removeIf(movie->movie.getId()%2==0);
 
@@ -82,8 +81,7 @@ public class MovieController {
     filters movies that have the title length less than some number
      */
 
-    public Set<Movie> filterMoviesWithTitleLessThan(int length)
-    {
+    public Set<Movie> filterMoviesWithTitleLessThan(int length) throws SQLException {
 
         Set<Movie> all = (Set<Movie>) repo.findAll();
         all.removeIf(movie->movie.getTitle().length() < length);

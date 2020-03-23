@@ -13,6 +13,7 @@ package Controller;
         import javax.xml.parsers.ParserConfigurationException;
         import javax.xml.transform.TransformerException;
         import java.io.IOException;
+        import java.sql.SQLException;
         import java.util.Optional;
         import java.util.Set;
 
@@ -22,30 +23,26 @@ package Controller;
 public class ClientController {
 
     private Repository<Integer, Client> repo;
-    private Repository<Integer, RentAction> repoRent;
     private ClientValidator validator;
 
-    public ClientController(Repository<Integer, Client> initRepo, Repository<Integer, RentAction> rentalXMLRepository)
+    public ClientController(Repository<Integer, Client> initRepo)
     {
         this.repo=initRepo;
-        this.repoRent = rentalXMLRepository;
         validator = new ClientValidator();
     }
 
 
 
-    public Optional<Client> getById(Integer clientId)
-    {
+    public Optional<Client> getById(Integer clientId) throws SQLException {
         return repo.findOne(clientId);
     }
 
-    public Set<Client> getAllClients()
-    {
+    public Set<Client> getAllClients() throws SQLException {
         Iterable<Client> clients = repo.findAll();
         return (Set<Client>) clients;
     }
 
-    public void addClient(Client clientToSave) throws ValidatorException, ParserConfigurationException, IOException, SAXException, TransformerException {
+    public void addClient(Client clientToSave) throws ValidatorException, ParserConfigurationException, IOException, SAXException, TransformerException, SQLException {
         try
         {
             validator.validate(clientToSave);
@@ -64,7 +61,7 @@ public class ClientController {
         }
         catch (ValidatorException v){
             throw  new ValidatorException((v.getMessage()));
-        } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
+        } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
             e.printStackTrace();
         }
     }
@@ -73,13 +70,12 @@ public class ClientController {
         try{
             repo.update(UpdatedClient);
 
-        } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
+        } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public Set<Client> filterOddId()
-    {
+    public Set<Client> filterOddId() throws SQLException {
 
         Set<Client> all = (Set<Client>) repo.findAll();
         all.removeIf(client->client.getId()%2!=0);
@@ -91,8 +87,7 @@ public class ClientController {
     filters clients that have the name length less than some number
      */
 
-    public Set<Client> filterClientsWithNameLessThan(int length)
-    {
+    public Set<Client> filterClientsWithNameLessThan(int length) throws SQLException {
         Set<Client> all = (Set<Client>) repo.findAll();
         all.removeIf(client->client.getName().length() < length);
 

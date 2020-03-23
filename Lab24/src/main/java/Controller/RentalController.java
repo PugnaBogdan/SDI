@@ -12,6 +12,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
@@ -37,7 +38,7 @@ public class RentalController {
         movieController = initMovieController;
     }
 
-    public Set<RentAction> getAllRentals() {
+    public Set<RentAction> getAllRentals() throws SQLException {
         Iterable<RentAction> rentals = repo.findAll();
         return (Set<RentAction>) rentals;
     }
@@ -68,6 +69,8 @@ public class RentalController {
             throw new RentalException(r.getMessage());
         } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
             e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -95,6 +98,8 @@ public class RentalController {
         catch (RentalException r){
                 throw new RentalException(r.getMessage());
         } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
@@ -128,13 +133,19 @@ public class RentalController {
 
     }
 
-    public List<String> getRentedMoviesOfMostActiveClient()
-    {
+    public List<String> getRentedMoviesOfMostActiveClient() throws SQLException {
         List<Integer> mostActive = getMostActiveClient();
         int clientId = mostActive.get(mostActive.size()-1);
         Set<String> all =  ((Set<RentAction>)repo.findAll()).stream()
                 .filter(e->e.getClientId()==clientId)
-                .map(ra->movieController.getById(ra.getMovieId()))
+                .map(ra-> {
+                    try {
+                        return movieController.getById(ra.getMovieId());
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                })
                 .filter(Optional::isPresent)
                 .map(o->o.get().getTitle())
                 .collect(Collectors.toSet());
@@ -142,17 +153,26 @@ public class RentalController {
         return new ArrayList<String>(all);
     }
 
-    public void updateTheReports()
-    {
+    public void updateTheReports() throws SQLException {
         mostRentedMovie = new HashMap<Integer,Integer>();
         mostActiveClient = new HashMap<Integer,Integer>();
         rentalOfMostActive = new ArrayList<String>();
         Set<RentAction> rents = (Set<RentAction>) repo.findAll();
-        rents.forEach(this::updateReports);
+
+            for(RentAction r: rents)
+            {
+                try {
+                    updateReports(r);
+                }
+
+                catch (SQLException e) {
+                    throw new SQLException();
+                }
+            }
+
     }
 
-    private void updateReports(RentAction rentalToAdd)
-    {
+    private void updateReports(RentAction rentalToAdd) throws SQLException {
         int clientKey = rentalToAdd.getClientId();
         int movieKey = rentalToAdd.getMovieId();
         int clientAmount=0,movieAmount=0;
@@ -182,12 +202,12 @@ public class RentalController {
         }
         catch (ValidatorException v){
             throw  new ValidatorException((v.getMessage()));
-        } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
+        } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public void deleteClient(Integer clientToDelete) throws ValidatorException{
+    public void deleteClient(Integer clientToDelete) throws ValidatorException, SQLException {
         clientController.deleteClient(clientToDelete);
         Iterable<RentAction> rentals = repo.findAll();
         rentals.forEach(Rent->{
@@ -197,7 +217,7 @@ public class RentalController {
         });
     }
 
-    public void deleteMovie(Integer movieToDelete) throws ValidatorException{
+    public void deleteMovie(Integer movieToDelete) throws ValidatorException, SQLException {
         movieController.deleteMovie(movieToDelete);
         Iterable<RentAction> rentals = repo.findAll();
         rentals.forEach(Rent->{
