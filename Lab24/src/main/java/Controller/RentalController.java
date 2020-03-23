@@ -28,7 +28,7 @@ public class RentalController {
     private MovieController movieController;
     private HashMap<Integer,Integer> mostRentedMovie = new HashMap<Integer,Integer>();
     private HashMap<Integer,Integer> mostActiveClient = new HashMap<Integer,Integer>();
-    private ArrayList<Integer> rentalOfMostActive = new ArrayList<Integer>();
+    private ArrayList<String> rentalOfMostActive = new ArrayList<String>();
 
     public RentalController(Repository<Integer, RentAction> repo, ClientController initClientController,MovieController initMovieController) {
         this.repo = repo;
@@ -128,23 +128,25 @@ public class RentalController {
 
     }
 
-    public List<Integer> getRentedMoviesOfMostActiveClient()
+    public List<String> getRentedMoviesOfMostActiveClient()
     {
         List<Integer> mostActive = getMostActiveClient();
         int clientId = mostActive.get(mostActive.size()-1);
-        Set<Integer> all =  ((Set<RentAction>)repo.findAll()).stream()
+        Set<String> all =  ((Set<RentAction>)repo.findAll()).stream()
                 .filter(e->e.getClientId()==clientId)
-                .map(RentAction::getMovieId)
+                .map(ra->movieController.getById(ra.getMovieId()))
+                .filter(Optional::isPresent)
+                .map(o->o.get().getTitle())
                 .collect(Collectors.toSet());
 
-        return new ArrayList<Integer>(all);
+        return new ArrayList<String>(all);
     }
 
     public void updateTheReports()
     {
         mostRentedMovie = new HashMap<Integer,Integer>();
         mostActiveClient = new HashMap<Integer,Integer>();
-        rentalOfMostActive = new ArrayList<Integer>();
+        rentalOfMostActive = new ArrayList<String>();
         Set<RentAction> rents = (Set<RentAction>) repo.findAll();
         rents.forEach(this::updateReports);
     }
@@ -170,7 +172,7 @@ public class RentalController {
         else
             mostRentedMovie.putIfAbsent(movieKey,1);
 
-         rentalOfMostActive = (ArrayList<Integer>) getRentedMoviesOfMostActiveClient();
+         rentalOfMostActive = (ArrayList<String>) getRentedMoviesOfMostActiveClient();
     }
 
 
