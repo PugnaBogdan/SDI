@@ -15,6 +15,7 @@ package Ui;
         import java.io.BufferedReader;
         import java.io.IOException;
         import java.io.InputStreamReader;
+        import java.sql.SQLException;
         import java.util.Collection;
         import java.util.List;
         import java.util.Map;
@@ -109,14 +110,14 @@ public class UserInterface {
                 }
                 else break;
 
-            } catch (IOException ex) {
+            } catch (IOException | SQLException ex) {
                 ex.printStackTrace();
             }
 
         }
     }
 
-    private void getReports() {
+    private void getReports() throws SQLException {
 
         rentalController.updateTheReports();
 
@@ -132,16 +133,16 @@ public class UserInterface {
 
     }
 
-    private void printAllClients() {
+    private void printAllClients() throws SQLException {
         Set<Client> clients = clientController.getAllClients();
         clients.forEach(System.out::println);
     }
 
-    private void printAllMovies() {
+    private void printAllMovies() throws SQLException {
         Set<Movie> students = movieController.getAllMovies();
         students.forEach(System.out::println);
     }
-    private void printAllRents() {
+    private void printAllRents() throws SQLException {
         Set<RentAction> rents = rentalController.getAllRentals();
         rents.forEach(System.out::println);
     }
@@ -243,7 +244,7 @@ public class UserInterface {
         try{
             int id = Integer.parseInt(bufferRead.readLine());
             rentalController.deleteClient(id);
-        } catch (IOException e) {
+        } catch (IOException | SQLException e) {
             e.printStackTrace();
         }
     }
@@ -254,7 +255,7 @@ public class UserInterface {
         try{
             int id = Integer.parseInt(bufferRead.readLine());
             rentalController.deleteMovie(id);
-        } catch (IOException e) {
+        } catch (IOException | SQLException e) {
             e.printStackTrace();
         }
     }
@@ -325,26 +326,27 @@ public class UserInterface {
 
     }
 
-    private void filterOddIdClient()
+    private void filterOddIdClient() throws SQLException
     {
         Set<Client> filtered = clientController.filterOddId();
 
         filtered.forEach(System.out::println);
     }
-    private void filterEvenMovie()
-    {
-        Set<Movie> filtered = movieController.filterEvenId();
-        filtered.forEach(System.out::println);
+    private void filterEvenMovie() throws SQLException {
+            Set<Movie> filtered = movieController.filterEvenId();
+            filtered.forEach(System.out::println);
+
+
     }
 
-    private void filterMovieByNameLength() throws IOException {
+    private void filterMovieByNameLength() throws IOException , SQLException {
         System.out.println("Type title length: ");
 
         BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
         Set<Movie> filtered = movieController.filterMoviesWithTitleLessThan(Integer.parseInt(bufferRead.readLine()));
         filtered.forEach(System.out::println);
     }
-    private void filterClientByNameLength() throws IOException {
+    private void filterClientByNameLength() throws IOException, SQLException {
         System.out.println("Type name length: ");
         BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
         Set<Client> filtered = clientController.filterClientsWithNameLessThan(Integer.parseInt(bufferRead.readLine()));

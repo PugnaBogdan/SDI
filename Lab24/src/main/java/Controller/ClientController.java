@@ -13,6 +13,7 @@ package Controller;
         import javax.xml.parsers.ParserConfigurationException;
         import javax.xml.transform.TransformerException;
         import java.io.IOException;
+        import java.sql.SQLException;
         import java.util.Optional;
         import java.util.Set;
 
@@ -39,8 +40,7 @@ public class ClientController {
         return repo.findOne(clientId);
     }
 
-    public Set<Client> getAllClients()
-    {
+    public Set<Client> getAllClients() throws SQLException {
         Iterable<Client> clients = repo.findAll();
         return (Set<Client>) clients;
     }
@@ -78,8 +78,7 @@ public class ClientController {
         }
     }
 
-    public Set<Client> filterOddId()
-    {
+    public Set<Client> filterOddId() throws SQLException {
 
         Set<Client> all = (Set<Client>) repo.findAll();
         all.removeIf(client->client.getId()%2!=0);
@@ -91,8 +90,7 @@ public class ClientController {
     filters clients that have the name length less than some number
      */
 
-    public Set<Client> filterClientsWithNameLessThan(int length)
-    {
+    public Set<Client> filterClientsWithNameLessThan(int length) throws SQLException {
         Set<Client> all = (Set<Client>) repo.findAll();
         all.removeIf(client->client.getName().length() < length);
 

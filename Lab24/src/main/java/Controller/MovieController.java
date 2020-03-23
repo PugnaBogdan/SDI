@@ -11,6 +11,7 @@ package Controller;
         import javax.xml.parsers.ParserConfigurationException;
         import javax.xml.transform.TransformerException;
         import java.io.IOException;
+        import java.sql.SQLException;
         import java.util.Optional;
         import java.util.Set;
 
@@ -34,7 +35,7 @@ public class MovieController {
         return repo.findOne(movieId);
     }
 
-    public Set<Movie> getAllMovies() {
+    public Set<Movie> getAllMovies() throws SQLException {
         Iterable<Movie> movies = repo.findAll();
         return (Set<Movie>) movies;
     }
@@ -70,8 +71,7 @@ public class MovieController {
         }
     }
 
-    public Set<Movie> filterEvenId()
-    {
+    public Set<Movie> filterEvenId() throws SQLException {
         Set<Movie> all = (Set<Movie>) repo.findAll();
         all.removeIf(movie->movie.getId()%2==0);
 
@@ -82,8 +82,7 @@ public class MovieController {
     filters movies that have the title length less than some number
      */
 
-    public Set<Movie> filterMoviesWithTitleLessThan(int length)
-    {
+    public Set<Movie> filterMoviesWithTitleLessThan(int length) throws SQLException {
 
         Set<Movie> all = (Set<Movie>) repo.findAll();
         all.removeIf(movie->movie.getTitle().length() < length);

@@ -7,6 +7,7 @@ package Repository;
         import javax.xml.parsers.ParserConfigurationException;
         import javax.xml.transform.TransformerException;
         import java.io.IOException;
+        import java.sql.SQLException;
         import java.util.Optional;
 
 /**
@@ -31,7 +32,7 @@ public interface Repository<ID, T extends BaseEntity<ID>> {
      *
      * @return all entities.
      */
-    Iterable<T> findAll();
+    Iterable<T> findAll() throws SQLException;
 
     /**
      * Saves the given entity.
