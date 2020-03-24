@@ -134,7 +134,14 @@ public class RentalController {
         int clientId = mostActive.get(mostActive.size()-1);
         Set<String> all =  ((Set<RentAction>)repo.findAll()).stream()
                 .filter(e->e.getClientId()==clientId)
-                .map(ra->movieController.getById(ra.getMovieId()))
+                .map(ra-> {
+                    try {
+                        return movieController.getById(ra.getMovieId());
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                })
                 .filter(Optional::isPresent)
                 .map(o->o.get().getTitle())
                 .collect(Collectors.toSet());
@@ -155,6 +162,18 @@ public class RentalController {
                 throw new SQLException();
             }
         }
+
+            for(RentAction r: rents)
+            {
+                try {
+                    updateReports(r);
+                }
+
+                catch (SQLException e) {
+                    throw new SQLException();
+                }
+            }
+
     }
 
     private void updateReports(RentAction rentalToAdd) throws SQLException {
@@ -187,7 +206,7 @@ public class RentalController {
         }
         catch (ValidatorException v){
             throw  new ValidatorException((v.getMessage()));
-        } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
+        } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
             e.printStackTrace();
         }
     }

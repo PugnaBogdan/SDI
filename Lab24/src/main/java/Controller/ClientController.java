@@ -23,20 +23,17 @@ package Controller;
 public class ClientController {
 
     private Repository<Integer, Client> repo;
-    private Repository<Integer, RentAction> repoRent;
     private ClientValidator validator;
 
-    public ClientController(Repository<Integer, Client> initRepo, Repository<Integer, RentAction> rentalXMLRepository)
+    public ClientController(Repository<Integer, Client> initRepo)
     {
         this.repo=initRepo;
-        this.repoRent = rentalXMLRepository;
         validator = new ClientValidator();
     }
 
 
 
-    public Optional<Client> getById(Integer clientId)
-    {
+    public Optional<Client> getById(Integer clientId) throws SQLException {
         return repo.findOne(clientId);
     }
 
@@ -45,7 +42,7 @@ public class ClientController {
         return (Set<Client>) clients;
     }
 
-    public void addClient(Client clientToSave) throws ValidatorException, ParserConfigurationException, IOException, SAXException, TransformerException {
+    public void addClient(Client clientToSave) throws ValidatorException, ParserConfigurationException, IOException, SAXException, TransformerException, SQLException {
         try
         {
             validator.validate(clientToSave);
@@ -64,7 +61,7 @@ public class ClientController {
         }
         catch (ValidatorException v){
             throw  new ValidatorException((v.getMessage()));
-        } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
+        } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
             e.printStackTrace();
         }
     }
@@ -73,7 +70,7 @@ public class ClientController {
         try{
             repo.update(UpdatedClient);
 
-        } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
+        } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
             e.printStackTrace();
         }
     }

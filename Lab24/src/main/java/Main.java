@@ -10,9 +10,15 @@ import Entities.Validators.RentalValidator;
 import Entities.Validators.Validator;
         import Repository.InMemoryRepository;
 import Repository.MovieXMLRepository;
+        import Repository.RentalDBRepo;
+        import Repository.ClientDBRepo;
+        import Repository.ClientFileRepository;
+        import Repository.ClientXMLRepository;
+        import Repository.MovieXMLRepository;
         import Repository.RentalXMLRepository;
         import Repository.Repository;
         import Repository.ClientXMLRepository;
+        import Repository.MovieDBRepo;
 import Ui.UserInterface;
 import org.xml.sax.SAXException;
 
@@ -34,15 +40,18 @@ public class Main {
         //Repository<Integer, Movie> movieFileRepository = new MovieFileRepository("D:\\anul2_sem2\\mpp\\SDI\\Lab24\\src\\main\\resources\\MovieRep.txt");
         //Repository<Integer, RentAction> rentalFileRepository = new RentalFileRepository("D:\\anul2_sem2\\mpp\\SDI\\Lab24\\src\\main\\resources\\RentalRep.txt");
 
-        Repository<Integer, Client> clientRepository = new ClientXMLRepository("src/main/resources/ClientRep.xml");
-        Repository<Integer, Movie> movieFileRepository = new MovieXMLRepository("src/main/resources/MovieRep.xml");
-        Repository<Integer, RentAction> rentalXMLRepository = new RentalXMLRepository("src/main/resources/RentRep.xml");
+        //Repository<Integer, Client> clientRepository = new ClientXMLRepository("src/main/resources/ClientRep.xml");
+        //Repository<Integer, Movie> movieFileRepository = new MovieXMLRepository("src/main/resources/MovieRep.xml");
+        //Repository<Integer, RentAction> rentalXMLRepository = new RentalXMLRepository("src/main/resources/RentRep.xml");
 
-        //Repository<Integer, Client> clientRepository = new ClientDBRepository();
+        Repository<Integer,RentAction> rentalDB = new RentalDBRepo();
+        Repository<Integer,Client> clientDB = new ClientDBRepo();
+        Repository<Integer, Movie> movieDB = new MovieDBRepo();
 
-        ClientController clientController = new ClientController(clientRepository, rentalXMLRepository);
-        MovieController movieController = new MovieController(movieFileRepository, rentalXMLRepository);
-        RentalController rentalController = new RentalController(rentalXMLRepository, clientController, movieController);
+
+        ClientController clientController = new ClientController(clientDB);
+        MovieController movieController = new MovieController(movieDB);
+        RentalController rentalController = new RentalController(rentalDB, clientController, movieController);
         UserInterface ui = new UserInterface(clientController, movieController, rentalController);
         ui.runConsole();
     }

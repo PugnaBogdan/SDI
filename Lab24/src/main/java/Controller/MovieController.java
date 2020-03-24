@@ -21,17 +21,14 @@ package Controller;
 public class MovieController {
 
     private Repository<Integer, Movie> repo;
-    private Repository<Integer, RentAction> repoRent;
     private MovieValidator validator;
 
-    public MovieController(Repository<Integer, Movie> initRepo, Repository<Integer, RentAction> rentalXMLRepository) {
+    public MovieController(Repository<Integer, Movie> initRepo) {
         repo = initRepo;
-        repoRent = rentalXMLRepository;
         validator = new MovieValidator();
     }
 
-    public Optional<Movie> getById(Integer movieId)
-    {
+    public Optional<Movie> getById(Integer movieId) throws SQLException {
         return repo.findOne(movieId);
     }
 
@@ -48,6 +45,8 @@ public class MovieController {
             throw new ValidatorException(v.getMessage());
         } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
             e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -57,7 +56,7 @@ public class MovieController {
         }
         catch (ValidatorException v){
             throw  new ValidatorException((v.getMessage()));
-        } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
+        } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
             e.printStackTrace();
         }
     }
@@ -66,7 +65,7 @@ public class MovieController {
         try{
             repo.update(updatedMovie);
 
-        } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
+        } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
             e.printStackTrace();
         }
     }
