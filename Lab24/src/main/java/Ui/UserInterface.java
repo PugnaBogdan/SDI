@@ -8,6 +8,7 @@ package Ui;
         import Entities.RentAction;
         import Entities.Validators.RentalException;
         import Entities.Validators.ValidatorException;
+        import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
         import org.xml.sax.SAXException;
 
         import javax.xml.parsers.ParserConfigurationException;
@@ -139,13 +140,13 @@ public class UserInterface {
 
     private void addClient() {
 
-        Client client = readClient();
+
         try {
-            clientController.addClient(client);
-        } catch (ValidatorException e) {
+            Client client = readClient();
+            if(client != null)
+                clientController.addClient(client);
+        } catch (ValidatorException | IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
             System.out.println(e.getMessage());
-        } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
-            e.printStackTrace();
         }
 
     }
@@ -184,7 +185,9 @@ public class UserInterface {
 
             return new Client(id, name, age);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            System.out.println(ex.getMessage());
+        } catch (NumberFormatException ex) {
+            System.out.println("Number format exception " + ex.getMessage());
         }
         return null;
     }
@@ -199,7 +202,7 @@ public class UserInterface {
             int price = Integer.parseInt(bufferRead.readLine());// ...
 
             return new Movie(id, titel, price);
-        } catch (IOException ex) {
+        } catch (IOException | NumberFormatException ex) {
             ex.printStackTrace();
         }
         return null;
@@ -215,8 +218,8 @@ public class UserInterface {
             int id2 = Integer.parseInt(bufferRead.readLine());// ...
 
             return new RentAction(id, id1, id2);
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        } catch (IOException | NumberFormatException ex) {
+            System.out.println(ex.getMessage());
         }
         return null;
     }
@@ -232,7 +235,7 @@ public class UserInterface {
             int id = Integer.parseInt(bufferRead.readLine());
             rentalController.deleteClient(id);
         } catch (IOException | SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 
@@ -244,7 +247,7 @@ public class UserInterface {
             int id = Integer.parseInt(bufferRead.readLine());
             rentalController.deleteMovie(id);
         } catch (IOException | SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 
@@ -256,7 +259,7 @@ public class UserInterface {
             int id = Integer.parseInt(bufferRead.readLine());
             rentalController.deleteRent(id);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 
@@ -273,7 +276,7 @@ public class UserInterface {
 
             clientController.updateClient(newCLient);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            System.out.println(ex.getMessage());
         }
         return null;
 
@@ -291,7 +294,7 @@ public class UserInterface {
 
             movieController.updateMovie(movie);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            System.out.println(ex.getMessage());
         }
         return null;
 

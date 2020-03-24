@@ -48,7 +48,7 @@ public class ClientController {
             validator.validate(clientToSave);
 
         }
-        catch(ValidatorException v)
+        catch(ValidatorException | NumberFormatException v)
         {
             throw new ValidatorException(v.getMessage());
         }

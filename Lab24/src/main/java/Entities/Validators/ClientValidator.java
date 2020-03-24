@@ -10,13 +10,20 @@ public class ClientValidator implements Validator<Client> {
 
     @Override
     public void validate(Client client) throws ValidatorException {
-        if(client.getId()<0)
-            throw new ValidatorException("Invalid ID!");
+        try {
 
-        if(client.getName().equals(""))
-            throw new ValidatorException("Empty Name!");
+            if (client.getId() < 0)
+                throw new ValidatorException("Invalid ID!");
 
-        if(client.getAge()<0)
-            throw new ValidatorException("Negative Age!");
+            if (client.getName().equals(""))
+                throw new ValidatorException("Empty Name!");
+
+            if (client.getAge() < 0)
+                throw new ValidatorException("Negative Age!");
+        }
+        catch (NumberFormatException e) {
+            throw new  NumberFormatException(e.getMessage());
+        }
+        }
     }
-}
+

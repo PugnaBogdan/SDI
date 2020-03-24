@@ -2,6 +2,7 @@ package Repository;
 
 import Entities.Client;
 import Entities.RentAction;
+import org.postgresql.core.SqlCommand;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -21,21 +22,25 @@ public class ClientDBRepo implements  Repository<Integer, Client> {
 
         Client c = new Client();
         String sql = "select clientId,name,age from clients";
+        try {
+            Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            PreparedStatement preparedStatement =
+                    connection.prepareStatement(sql);
 
-        Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
-        PreparedStatement preparedStatement =
-                connection.prepareStatement(sql);
+            ResultSet result = preparedStatement.executeQuery();
+            result.next();
 
-        ResultSet result = preparedStatement.executeQuery();
-        result.next();
+            int clientId = result.getInt("clientId");
+            String name = result.getString("name");
+            int age = result.getInt("age");
 
-        int clientId = result.getInt("clientId");
-        String name = result.getString("name");
-        int age = result.getInt("age");
-
-        c.setClientId(clientId);
-        c.setName(name);
-        c.setAge(age);
+            c.setClientId(clientId);
+            c.setName(name);
+            c.setAge(age);
+        }
+        catch (SQLException e){
+            throw new SQLException(e);
+        }
 
         return Optional.of(c);
     }
@@ -43,18 +48,24 @@ public class ClientDBRepo implements  Repository<Integer, Client> {
     @Override
     public Iterable<Client> findAll() throws SQLException {
         Set<Client> all = new HashSet<Client>();
+
         String sql = "select * from clients";
-        Connection connection = DriverManager.getConnection(URL,USER,PASSWORD);
-        PreparedStatement statement = connection.prepareStatement(sql);
+        try {
 
-        ResultSet result = statement.executeQuery();
-        while(result.next())
-        {
-            int clientId = result.getInt("clientId");
-            String name = result.getString("name");
-            int age = result.getInt("age");
+            Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            PreparedStatement statement = connection.prepareStatement(sql);
 
-            all.add(new Client(clientId,name,age));
+            ResultSet result = statement.executeQuery();
+            while (result.next()) {
+                int clientId = result.getInt("clientId");
+                String name = result.getString("name");
+                int age = result.getInt("age");
+
+                all.add(new Client(clientId, name, age));
+            }
+        }
+        catch (SQLException e){
+            throw new SQLException(e);
         }
 
         return all;
@@ -65,15 +76,20 @@ public class ClientDBRepo implements  Repository<Integer, Client> {
     public Optional<Client> save(Client entity) throws ParserConfigurationException, TransformerException, SAXException, IOException, SQLException {
 
         String sql = "insert into clients (clientId,name,age) values(?,?,?)";
+        try {
 
-        Connection connection = DriverManager.getConnection(URL,USER,PASSWORD);
-        PreparedStatement statement = connection.prepareStatement(sql);
+            Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            PreparedStatement statement = connection.prepareStatement(sql);
 
-        statement.setInt(1,entity.getId());
-        statement.setString(2,entity.getName());
-        statement.setInt(3,entity.getAge());
+            statement.setInt(1, entity.getId());
+            statement.setString(2, entity.getName());
+            statement.setInt(3, entity.getAge());
 
-        statement.executeUpdate();
+            statement.executeUpdate();
+        }
+        catch (SQLException e){
+            throw new SQLException(e);
+        }
 
         return Optional.empty();
     }
