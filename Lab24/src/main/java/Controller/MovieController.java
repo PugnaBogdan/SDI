@@ -63,6 +63,11 @@ public class MovieController {
 
     public void updateMovie(Movie updatedMovie) {
         try{
+            Optional<Movie> m = getById(updatedMovie.getId());
+
+            if(!m.isPresent())
+                throw new ValidatorException("Movie does not exist");
+
             repo.update(updatedMovie);
 
         } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {

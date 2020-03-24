@@ -1,70 +1,69 @@
 package Repository;
 
-import Entities.Client;
-import Entities.RentAction;
+import Entities.Movie;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.sql.*;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
-public class ClientDBRepo implements  Repository<Integer, Client> {
+public class MovieDBRepo implements Repository<Integer, Movie> {
 
     private static final String URL = "jdbc:postgresql://localhost:5432/movierental";
-    private static final String USER = "postgres";
-    private static final String PASSWORD = "admin";
+    private static final String USER = System.getProperty("username");
+    private static final String PASSWORD = System.getProperty("password");
 
     @Override
-    public Optional<Client> findOne(Integer integer) throws SQLException {
-
+    public Optional<Movie> findOne(Integer integer) throws SQLException {
         try {
-            Client c = new Client();
-            String sql = "select clientId,name,age from clients where clientId=?";
+            Movie m = new Movie();
+            String sql = "select movieid,title,price from movie where movieid=?";
 
             Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
             PreparedStatement preparedStatement =
                     connection.prepareStatement(sql);
 
-            preparedStatement.setInt(1,integer);
+            preparedStatement.setInt(1, integer);
 
             ResultSet result = preparedStatement.executeQuery();
             result.next();
 
+            int movieId = result.getInt("movieId");
+            String title = result.getString("title");
+            int price = result.getInt("price");
 
+            m.setMovieId(movieId);
+            m.setTitle(title);
+            m.setPrice(price);
 
-            int clientId = result.getInt("clientId");
-            String name = result.getString("name");
-            int age = result.getInt("age");
-
-            c.setClientId(clientId);
-            c.setName(name);
-            c.setAge(age);
-
-            return Optional.of(c);
+            return Optional.of(m);
         }
         catch(SQLException e)
         {
-            throw new SQLException("Client does not exist!");
+            throw new SQLException("Movie does not exist");
         }
     }
 
     @Override
-    public Iterable<Client> findAll() throws SQLException {
+    public Iterable<Movie> findAll() throws SQLException {
         try {
-            Set<Client> all = new HashSet<Client>();
-            String sql = "select * from clients";
+
+            Set<Movie> all = new HashSet<Movie>();
+            String sql = "select * from movie";
             Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
             PreparedStatement statement = connection.prepareStatement(sql);
 
             ResultSet result = statement.executeQuery();
             while (result.next()) {
-                int clientId = result.getInt("clientId");
-                String name = result.getString("name");
-                int age = result.getInt("age");
+                int movieId = result.getInt("movieId");
+                String title = result.getString("title");
+                int price = result.getInt("price");
 
-                all.add(new Client(clientId, name, age));
+                all.add(new Movie(movieId, title, price));
             }
 
             return all;
@@ -73,21 +72,20 @@ public class ClientDBRepo implements  Repository<Integer, Client> {
         {
             throw new SQLException("Cannot get data");
         }
-
     }
 
     @Override
-    public Optional<Client> save(Client entity) throws ParserConfigurationException, TransformerException, SAXException, IOException, SQLException {
+    public Optional<Movie> save(Movie entity) throws ParserConfigurationException, TransformerException, SAXException, IOException, SQLException {
 
         try {
-            String sql = "insert into clients (clientId,name,age) values(?,?,?)";
+            String sql = "insert into movie (movieid,title,price) values(?,?,?)";
 
             Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
             PreparedStatement statement = connection.prepareStatement(sql);
 
             statement.setInt(1, entity.getId());
-            statement.setString(2, entity.getName());
-            statement.setInt(3, entity.getAge());
+            statement.setString(2, entity.getTitle());
+            statement.setInt(3, entity.getPrice());
 
             statement.executeUpdate();
 
@@ -100,16 +98,14 @@ public class ClientDBRepo implements  Repository<Integer, Client> {
     }
 
     @Override
-    public Optional<Client> delete(Integer integer) throws ParserConfigurationException, IOException, SAXException, TransformerException, SQLException {
-
+    public Optional<Movie> delete(Integer integer) throws ParserConfigurationException, IOException, SAXException, TransformerException, SQLException {
         try {
-            String sql = "delete from clients where clientId=?";
+            String sql = "delete from movie where movieid=?";
             Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
             PreparedStatement statement = connection.prepareStatement(sql);
 
             statement.setInt(1, integer);
             statement.executeUpdate();
-
 
             return Optional.empty();
         }
@@ -120,18 +116,18 @@ public class ClientDBRepo implements  Repository<Integer, Client> {
     }
 
     @Override
-    public Optional<Client> update(Client entity) throws ParserConfigurationException, TransformerException, SAXException, IOException, SQLException {
-
+    public Optional<Movie> update(Movie entity) throws ParserConfigurationException, TransformerException, SAXException, IOException, SQLException {
         try {
-            String sql = "update clients set name=?, age=? where clientId=?";
+            String sql = "update movie set title=?, price=? where movieid=?";
             Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
             PreparedStatement statement = connection.prepareStatement(sql);
 
-            statement.setString(1, entity.getName());
-            statement.setInt(2, entity.getAge());
+            statement.setString(1, entity.getTitle());
+            statement.setInt(2, entity.getPrice());
             statement.setInt(3, entity.getId());
 
             statement.executeUpdate();
+
 
             return Optional.empty();
         }

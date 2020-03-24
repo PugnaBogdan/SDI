@@ -52,6 +52,7 @@ public class ClientController {
         {
             throw new ValidatorException(v.getMessage());
         }
+
         repo.save(clientToSave);
     }
 
@@ -68,6 +69,10 @@ public class ClientController {
 
     public void updateClient(Client UpdatedClient) {
         try{
+
+            Optional<Client> c = getById(UpdatedClient.getId());
+            if(!c.isPresent())
+                throw new ValidatorException("Client does not exist");
             repo.update(UpdatedClient);
 
         } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {

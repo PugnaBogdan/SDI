@@ -81,10 +81,12 @@ public class RentalController {
             int movieID = rent.getMovieId();
 
             Optional<Client> c = clientController.getById(clientID);
-            Optional<Movie> m = movieController.getById(movieID);
+
 
             if(!c.isPresent())
                 throw new ValidatorException("Client does not exist");
+
+            Optional<Movie> m = movieController.getById(movieID);
 
             if(!m.isPresent())
                 throw new ValidatorException("Movie does not exist");
