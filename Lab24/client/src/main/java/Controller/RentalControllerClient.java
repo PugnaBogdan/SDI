@@ -178,6 +178,7 @@ public class RentalControllerClient implements RentalService {
         },executorService);
     }
 
+
     /// DOESN'T MATTER ANYMORE-----------------------
     @Override
     public CompletableFuture<Void> deleteClientCascade(int clientToDelete) throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException, SQLException {

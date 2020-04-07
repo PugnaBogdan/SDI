@@ -12,6 +12,7 @@ import tcp.TcpServer;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -19,7 +20,7 @@ import java.util.concurrent.Executors;
  * @author Pugna.
  */
 public class serverMain {
-    public static void main(String args[]) throws ParserConfigurationException, SAXException, IOException {
+    public static void main(String args[]) throws ParserConfigurationException, SAXException, IOException, SQLException {
         Validator<Movie> movieValidator = new MovieValidator();
         Validator<Client> clientValidator = new ClientValidator();
         Validator<RentAction> rentalValidator = new RentalValidator();

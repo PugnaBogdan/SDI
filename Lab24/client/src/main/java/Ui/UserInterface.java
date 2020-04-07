@@ -451,6 +451,7 @@ public class UserInterface {
                     }
                 }
                 else if (arguments[0].equals("raport")){
+
                     if (arguments[1].equals("active")){
                         mostActiveClient(arguments);
                     }
@@ -458,7 +459,7 @@ public class UserInterface {
                         mostRentedMovies(arguments);
                     }
                     else if(arguments[1].equals("all")){
-                        mostRentedMovies(arguments);
+                        allRaports(arguments);
                     }
                     else {
                         System.out.println("can't filter with that, sorry");

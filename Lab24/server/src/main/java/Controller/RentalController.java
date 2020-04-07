@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,7 @@ public class RentalController implements RentalService{
     private List<String> rentalOfMostActive = new ArrayList<String>();
     private ExecutorService executorService;
 
-    public RentalController(Repository<Integer, RentAction> repo, ClientService initClientController, MovieService initMovieController, ExecutorService executorService) {
+    public RentalController(Repository<Integer, RentAction> repo, ClientService initClientController, MovieService initMovieController, ExecutorService executorService) throws SQLException {
         this.repo = repo;
         validator = new RentValidator();
         clientController = initClientController;
@@ -72,12 +73,16 @@ public class RentalController implements RentalService{
 
                 repo.save(rentalToAdd);
                 updateReports(rentalToAdd);
-                return null;
 
-            } catch(ValidatorException | NumberFormatException | ParserConfigurationException | TransformerException | SAXException | IOException | SQLException v)
+
+            }
+            catch(ValidatorException | NumberFormatException | ParserConfigurationException | TransformerException | SAXException | IOException | SQLException v)
             {
                 throw new ValidatorException(v.getMessage());
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
             }
+            return null;
 
         },executorService);
     }
@@ -105,6 +110,8 @@ public class RentalController implements RentalService{
             } catch(ValidatorException | NumberFormatException | ParserConfigurationException | TransformerException | SAXException | IOException | SQLException v)
             {
                 throw new ValidatorException(v.getMessage());
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
             }
             return null;
         },executorService);
@@ -143,11 +150,13 @@ public class RentalController implements RentalService{
     }
 
     public CompletableFuture<List<String>> getRentedMoviesOfMostActiveClient() throws SQLException {
+
         return CompletableFuture.supplyAsync(()-> {
             List<Integer> mostActive = null;
             try {
-                mostActive = (List<Integer>) getMostActiveClient();
-            } catch (SQLException e) {
+                mostActive = new ArrayList<>(getMostActiveClient().get());
+
+            } catch (SQLException | InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
             int clientId = mostActive.get(mostActive.size() - 1);
@@ -176,33 +185,43 @@ public class RentalController implements RentalService{
 
 
     public void updateTheReports() throws SQLException {
-        mostRentedMovie = new HashMap<Integer,Integer>();
-        mostActiveClient = new HashMap<Integer,Integer>();
+        mostRentedMovie = new HashMap<Integer, Integer>();
+        mostActiveClient = new HashMap<Integer, Integer>();
         rentalOfMostActive = new ArrayList<String>();
-        Set<RentAction> rents = (Set<RentAction>) repo.findAll();
-        for(RentAction r: rents){
-            try{
+        Set<RentAction> rents = null;
+        try {
+            rents = (Set<RentAction>) repo.findAll();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        for (RentAction r : rents) {
+            try {
                 updateReports(r);
-            }
-            catch (SQLException e){
-                throw new SQLException();
+            } catch (SQLException | ExecutionException | InterruptedException e) {
+                try {
+                    throw new SQLException();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
             }
         }
 
-            for(RentAction r: rents)
-            {
+        for (RentAction r : rents) {
+            try {
+                updateReports(r);
+            } catch (SQLException | ExecutionException | InterruptedException e) {
                 try {
-                    updateReports(r);
-                }
-
-                catch (SQLException e) {
                     throw new SQLException();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
                 }
             }
+        }
+
 
     }
 
-    private void updateReports(RentAction rentalToAdd) throws SQLException {
+    private void updateReports(RentAction rentalToAdd) throws SQLException, ExecutionException, InterruptedException {
         int clientKey = rentalToAdd.getClientId();
         int movieKey = rentalToAdd.getMovieId();
         int clientAmount=0,movieAmount=0;
@@ -222,7 +241,7 @@ public class RentalController implements RentalService{
         else
             mostRentedMovie.putIfAbsent(movieKey,1);
 
-         rentalOfMostActive =  getRentedMoviesOfMostActiveClient();
+         //rentalOfMostActive = new ArrayList<>(getRentedMoviesOfMostActiveClient().get());
     }
 
 
