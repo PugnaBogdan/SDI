@@ -8,6 +8,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -18,4 +19,6 @@ public interface RentalService {
     CompletableFuture<Void> deleteRent(Integer rentToDelete)throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException,SQLException;
     CompletableFuture<Void> deleteClientCascade(int clientToDelete)throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException,SQLException;
     CompletableFuture<Void> deleteMovieCascade(int movieToDelete)throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException,SQLException;
+    CompletableFuture<List<Integer>> getMostActiveClient() throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException,SQLException;
+    CompletableFuture<List<Integer>> getMostRentedMovie()throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException,SQLException;
 }

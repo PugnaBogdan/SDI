@@ -329,6 +329,32 @@ public class UserInterface {
         );
 
     }
+    public void mostActiveClient(String[] arguments) throws SQLException, ParserConfigurationException, TransformerException, SAXException, IOException {
+        rentalController.getMostActiveClient().thenAccept(
+                result-> {
+                    System.out.println(result.get(result.size()-1));
+                }
+        ).exceptionally(
+                error->{
+                    System.out.println(error.getMessage());
+                    return null;
+                }
+        );
+
+    }
+    public void mostRentedMovies(String[] arguments) throws SQLException, ParserConfigurationException, TransformerException, SAXException, IOException {
+        rentalController.getMostRentedMovie().thenAccept(
+                result-> {
+                    System.out.println(result.get(result.size()-1));
+                }
+        ).exceptionally(
+                error->{
+                    System.out.println(error.getMessage());
+                    return null;
+                }
+        );
+
+    }
 
     public void run() throws SQLException, ParserConfigurationException, SAXException, IOException, TransformerException {
         String command;
@@ -410,7 +436,19 @@ public class UserInterface {
                     else {
                         System.out.println("idk who's that ¯\\_(ツ)_/¯");
                     }
-                } else {
+                }
+                else if (arguments[0].equals("raport")){
+                    if (arguments[1].equals("active")){
+                        mostActiveClient(arguments);
+                    }
+                    else if(arguments[1].equals("rented")){
+                        mostRentedMovies(arguments);
+                    }
+                    else {
+                        System.out.println("can't filter with that, sorry");
+                    }
+                }
+                else {
                     System.out.println("can't do ¯\\_(ツ)_/¯");
                 }
             }

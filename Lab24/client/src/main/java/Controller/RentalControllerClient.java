@@ -12,10 +12,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
@@ -118,7 +115,49 @@ public class RentalControllerClient implements RentalService {
             }
         },executorService);
     }
+    @Override
+    public CompletableFuture<List<Integer>> getMostActiveClient() throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException, SQLException {
+        return CompletableFuture.supplyAsync(()->
+        {
+            Message request = new Message(MessageHeaders.getMostActiveClient,null);
+            Message response = tcpClient.sendAndReceive(request);
+            if(response.getHeader().equals(MessageHeaders.good))
+            {
 
+                return(List<Integer>)(response.getBody().get(0).getValue());
+
+            }else if(response.getHeader().equals(MessageHeaders.error))
+            {
+                throw new ValidatorException((String)response.getBody().get(0).getValue());
+            }
+            else {
+                throw new ValidatorException("Rental side error?");
+            }
+        },executorService);
+    }
+
+    @Override
+    public CompletableFuture<List<Integer>> getMostRentedMovie() throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException, SQLException {
+        return CompletableFuture.supplyAsync(()->
+        {
+            Message request = new Message(MessageHeaders.getMostRentedMovie,null);
+            Message response = tcpClient.sendAndReceive(request);
+            if(response.getHeader().equals(MessageHeaders.good))
+            {
+
+                return(List<Integer>)(response.getBody().get(0).getValue());
+
+            }else if(response.getHeader().equals(MessageHeaders.error))
+            {
+                throw new ValidatorException((String)response.getBody().get(0).getValue());
+            }
+            else {
+                throw new ValidatorException("Rental side error?");
+            }
+        },executorService);
+    }
+
+    /// DOESN'T MATTER ANYMORE-----------------------
     @Override
     public CompletableFuture<Void> deleteClientCascade(int clientToDelete) throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException, SQLException {
         return CompletableFuture.supplyAsync(()->{
@@ -162,4 +201,6 @@ public class RentalControllerClient implements RentalService {
             }
         },executorService);
     }
+
+
 }

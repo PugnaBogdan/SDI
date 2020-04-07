@@ -28,7 +28,7 @@ public class RentalController implements RentalService{
     private MovieService movieController;
     private HashMap<Integer,Integer> mostRentedMovie = new HashMap<Integer,Integer>();
     private HashMap<Integer,Integer> mostActiveClient = new HashMap<Integer,Integer>();
-    private CompletableFuture<List<String>> rentalOfMostActive = new CompletableFuture<List<String>>();
+    private List<String> rentalOfMostActive = new ArrayList<String>();
     private ExecutorService executorService;
 
     public RentalController(Repository<Integer, RentAction> repo, ClientService initClientController, MovieService initMovieController, ExecutorService executorService) {
@@ -111,8 +111,8 @@ public class RentalController implements RentalService{
     }
 
 
-    public CompletableFuture<List<Integer>> getMostActiveClient()
-    {
+    public CompletableFuture<List<Integer>> getMostActiveClient() throws SQLException {
+        updateTheReports();
         return CompletableFuture.supplyAsync(()-> {
             Map<Integer, Integer> mostActive = mostActiveClient.entrySet()
                     .stream()
@@ -126,8 +126,8 @@ public class RentalController implements RentalService{
         });
     }
 
-    public CompletableFuture<List<Integer>> getMostRentedMovie()
-    {
+    public CompletableFuture<List<Integer>> getMostRentedMovie() throws SQLException {
+        updateTheReports();
         return CompletableFuture.supplyAsync(()-> {
             Map<Integer, Integer> mostRented = mostRentedMovie.entrySet()
                     .stream()
@@ -144,7 +144,12 @@ public class RentalController implements RentalService{
 
     public CompletableFuture<List<String>> getRentedMoviesOfMostActiveClient() throws SQLException {
         return CompletableFuture.supplyAsync(()-> {
-            List<Integer> mostActive = (List<Integer>) getMostActiveClient();
+            List<Integer> mostActive = null;
+            try {
+                mostActive = (List<Integer>) getMostActiveClient();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             int clientId = mostActive.get(mostActive.size() - 1);
             Set<String> all = null;
             try {
@@ -172,7 +177,7 @@ public class RentalController implements RentalService{
     public void updateTheReports() throws SQLException {
         mostRentedMovie = new HashMap<Integer,Integer>();
         mostActiveClient = new HashMap<Integer,Integer>();
-        rentalOfMostActive = new CompletableFuture<List<String>>();
+        rentalOfMostActive = new ArrayList<String>();
         Set<RentAction> rents = (Set<RentAction>) repo.findAll();
         for(RentAction r: rents){
             try{
@@ -216,7 +221,7 @@ public class RentalController implements RentalService{
         else
             mostRentedMovie.putIfAbsent(movieKey,1);
 
-         rentalOfMostActive = getRentedMoviesOfMostActiveClient();
+         //rentalOfMostActive = getRentedMoviesOfMostActiveClient();
     }
 
 
@@ -233,6 +238,7 @@ public class RentalController implements RentalService{
         },executorService);
     }
 
+    /// THEY DONT MATTER ANYMORE ----------------------------------
     public CompletableFuture<Void> deleteClientCascade(int clientToDelete) throws ValidatorException, SQLException, ParserConfigurationException, TransformerException, SAXException, IOException {
         return CompletableFuture.supplyAsync(()-> {
             try {

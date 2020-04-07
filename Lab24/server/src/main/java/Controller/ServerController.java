@@ -298,6 +298,48 @@ public class ServerController {
                     return request;
                 }
         );
+        this.tcpServer.addHandler(MessageHeaders.getMostActiveClient,
+                request ->
+                {
+                    try {
+                        return this.rentalService.getMostActiveClient()
+                                .thenApply(
+                                        rentals -> {
+                                            Message response = new Message(MessageHeaders.good, new ArrayList<>());
+                                            response.getBody().add(new AbstractMap.SimpleEntry<>("active client", rentals));
+                                            return response;
+                                        }
+                                )
+                                .exceptionally(
+                                        e -> error("message", e.getMessage())
+                                ).join();
+                    } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
+                        e.printStackTrace();
+                    }
+                    return request;
+                }
+        );
+        this.tcpServer.addHandler(MessageHeaders.getMostRentedMovie,
+                request ->
+                {
+                    try {
+                        return this.rentalService.getMostRentedMovie()
+                                .thenApply(
+                                        rentals -> {
+                                            Message response = new Message(MessageHeaders.good, new ArrayList<>());
+                                            response.getBody().add(new AbstractMap.SimpleEntry<>("active movies", rentals));
+                                            return response;
+                                        }
+                                )
+                                .exceptionally(
+                                        e -> error("message", e.getMessage())
+                                ).join();
+                    } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
+                        e.printStackTrace();
+                    }
+                    return request;
+                }
+        );
         this.tcpServer.addHandler(MessageHeaders.addRental,request->{
             try{
                 return rentalService.addRental((RentAction) request.getBody().get(0).getValue())

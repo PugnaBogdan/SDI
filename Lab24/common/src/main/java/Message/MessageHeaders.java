@@ -26,6 +26,9 @@ public enum MessageHeaders {
     updateRental,
     deleteRent,
     deleteClientCascade,
-    deleteMovieCascade
+    deleteMovieCascade,
+    getMostActiveClient,
+    updateTheReports,
+    getMostRentedMovie
 }
 
