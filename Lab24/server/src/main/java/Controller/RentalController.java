@@ -127,7 +127,7 @@ public class RentalController implements RentalService{
                     .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
                             LinkedHashMap::new));
 
-            System.out.println(mostActive);
+            //System.out.println(mostActive);
 
             return new ArrayList<>(mostActive.keySet());
         });
@@ -142,7 +142,7 @@ public class RentalController implements RentalService{
                     .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
                             LinkedHashMap::new));
 
-            System.out.println(mostRented);
+            //System.out.println(mostRented);
 
             return new ArrayList<>(mostRented.keySet());
         });
@@ -166,59 +166,49 @@ public class RentalController implements RentalService{
                         .filter(e -> e.getClientId() == clientId)
                         .map(ra -> {
                             try {
+                                System.out.println(ra.getMovieId());
                                 return movieController.getById(ra.getMovieId());
                             } catch (SQLException e) {
                                 e.printStackTrace();
                             }
                             return null;
                         })
+                        .filter(Objects::nonNull)
                         .filter(Optional::isPresent)
                         .map(o -> o.get().getTitle())
                         .collect(Collectors.toSet());
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-
             return new ArrayList<String>(all);
         });
     }
 
 
     public void updateTheReports() throws SQLException {
-        mostRentedMovie = new HashMap<Integer, Integer>();
-        mostActiveClient = new HashMap<Integer, Integer>();
+        mostRentedMovie = new HashMap<Integer,Integer>();
+        mostActiveClient = new HashMap<Integer,Integer>();
         rentalOfMostActive = new ArrayList<String>();
-        Set<RentAction> rents = null;
-        try {
-            rents = (Set<RentAction>) repo.findAll();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        for (RentAction r : rents) {
-            try {
+        Set<RentAction> rents = (Set<RentAction>) repo.findAll();
+        for(RentAction r: rents){
+            try{
                 updateReports(r);
-            } catch (SQLException | ExecutionException | InterruptedException e) {
-                try {
-                    throw new SQLException();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
+            }
+            catch (SQLException | ExecutionException | InterruptedException e){
+                throw new SQLException();
             }
         }
 
-        for (RentAction r : rents) {
+        for(RentAction r: rents)
+        {
             try {
                 updateReports(r);
-            } catch (SQLException | ExecutionException | InterruptedException e) {
-                try {
-                    throw new SQLException();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
+            }
+
+            catch (SQLException | ExecutionException | InterruptedException e) {
+                throw new SQLException();
             }
         }
-
-
     }
 
     private void updateReports(RentAction rentalToAdd) throws SQLException, ExecutionException, InterruptedException {
