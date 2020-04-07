@@ -1,6 +1,9 @@
 package Controller;
 
 import Entities.Client;
+import Entities.Movie;
+import Entities.RentAction;
+import Entities.Validators.ValidatorException;
 import Message.Message;
 import Message.MessageHeaders;
 import org.xml.sax.SAXException;
@@ -16,11 +19,15 @@ import java.util.ArrayList;
 public class ServerController {
     TcpServer tcpServer;
     ClientService clientService;
+    MovieService movieService;
+    RentalService rentalService;
 
-    public ServerController(TcpServer srv, ClientService clientService)
+    public ServerController(TcpServer srv, ClientService clientService, MovieService movieService, RentalService rentalController)
     {
         tcpServer = srv;
         this.clientService = clientService;
+        this.movieService = movieService;
+        this.rentalService = rentalController;
     }
 
     public Message ok(String field, String msg)
@@ -38,6 +45,10 @@ public class ServerController {
     }
 
     public void handlersToHeader() {
+
+
+        // CLIENT---------------------------------------------------------------------------
+
 
         this.tcpServer.addHandler(MessageHeaders.addClient,request->{
             try{
@@ -151,6 +162,213 @@ public class ServerController {
                     return request;
                 }
         );
+
+
+        // MOVIES ------------------------------------------------------------------
+
+
+        this.tcpServer.addHandler(MessageHeaders.getMovies,
+                request ->
+                {
+                    try {
+                        return this.movieService.getAllMovies()
+                                .thenApply(
+                                        movies -> {
+                                            Message response = new Message(MessageHeaders.good, new ArrayList<>());
+                                            response.getBody().add(new AbstractMap.SimpleEntry<>("movies", movies));
+                                            return response;
+                                        }
+                                )
+                                .exceptionally(
+                                        e -> error("message", e.getMessage())
+                                ).join();
+                    } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
+                        e.printStackTrace();
+                    }
+                    return request;
+                }
+        );
+        this.tcpServer.addHandler(MessageHeaders.updateMovie,request->{
+            try{
+                return movieService.updateMovie((Movie) request.getBody().get(0).getValue())
+                        .thenApply(
+                                client-> ok("message","Movie updated")
+                        ).exceptionally(
+                                err -> error("error" ,err.getMessage())
+                        ).join();
+            }
+            catch (Exception e)
+            {
+                return error("message",e.getMessage());
+            }
+        });
+
+
+        this.tcpServer.addHandler(MessageHeaders.deleteMovie,request->{
+            try{
+                return movieService.deleteMovie((int) request.getBody().get(0).getValue())
+                        .thenApply(
+                                client-> ok("message","Movie deleted")
+                        ).exceptionally(
+                                err -> error("error" ,err.getMessage())
+                        ).join();
+            }
+            catch (Exception e)
+            {
+                return error("message",e.getMessage());
+            }
+        });
+        this.tcpServer.addHandler(MessageHeaders.addMovie,request->{
+            try{
+                return movieService.addMovie((Movie) request.getBody().get(0).getValue())
+                        .thenApply(
+                                client-> ok("message","Movie added")
+                        ).exceptionally(
+                                err -> error("error" ,err.getMessage())
+                        ).join();
+            }
+            catch (Exception e)
+            {
+                return error("message",e.getMessage());
+            }
+        });
+        this.tcpServer.addHandler(MessageHeaders.filterEvenId,
+                request ->
+                {
+                    try {
+                        return this.movieService.filterEvenId()
+                                .thenApply(
+                                        movies -> {
+                                            Message response = new Message(MessageHeaders.good, new ArrayList<>());
+                                            response.getBody().add(new AbstractMap.SimpleEntry<>("movies", movies));
+                                            return response;
+                                        }
+                                )
+                                .exceptionally(
+                                        e -> error("message", e.getMessage())
+                                ).join();
+                    } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
+                        e.printStackTrace();
+                    }
+                    return request;
+                }
+        );
+        this.tcpServer.addHandler(MessageHeaders.filterMoviesWithTitleLessThan,
+                request ->
+                {
+                    try {
+                        return this.movieService.filterMoviesWithTitleLessThan((int) request.getBody().get(0).getValue())
+                                .thenApply(
+                                        movies -> {
+                                            Message response = new Message(MessageHeaders.good, new ArrayList<>());
+                                            response.getBody().add(new AbstractMap.SimpleEntry<>("movies", movies));
+                                            return response;
+                                        }
+                                )
+                                .exceptionally(
+                                        e -> error("message", e.getMessage())
+                                ).join();
+                    } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
+                        e.printStackTrace();
+                    }
+                    return request;
+                }
+        );
+
+        // RENTALS ---------------------------------------------------------------------------
+
+        this.tcpServer.addHandler(MessageHeaders.getAllRentals,
+                request ->
+                {
+                    try {
+                        return this.rentalService.getAllRentals()
+                                .thenApply(
+                                        rentals -> {
+                                            Message response = new Message(MessageHeaders.good, new ArrayList<>());
+                                            response.getBody().add(new AbstractMap.SimpleEntry<>("rentals", rentals));
+                                            return response;
+                                        }
+                                )
+                                .exceptionally(
+                                        e -> error("message", e.getMessage())
+                                ).join();
+                    } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
+                        e.printStackTrace();
+                    }
+                    return request;
+                }
+        );
+        this.tcpServer.addHandler(MessageHeaders.addRental,request->{
+            try{
+                return rentalService.addRental((RentAction) request.getBody().get(0).getValue())
+                        .thenApply(
+                                client-> ok("message","Rent added")
+                        ).exceptionally(
+                                err -> error("error" ,err.getMessage())
+                        ).join();
+            }
+            catch (Exception e)
+            {
+                return error("message",e.getMessage());
+            }
+        });
+        this.tcpServer.addHandler(MessageHeaders.updateRental,request->{
+            try{
+                return rentalService.updateRental((RentAction) request.getBody().get(0).getValue())
+                        .thenApply(
+                                client-> ok("message","Rent updated")
+                        ).exceptionally(
+                                err -> error("error" ,err.getMessage())
+                        ).join();
+            }
+            catch (Exception e)
+            {
+                return error("message",e.getMessage());
+            }
+        });
+        this.tcpServer.addHandler(MessageHeaders.deleteRent,request->{
+            try{
+                return rentalService.deleteRent((int) request.getBody().get(0).getValue())
+                        .thenApply(
+                                client-> ok("message","Rent deleted")
+                        ).exceptionally(
+                                err -> error("error" ,err.getMessage())
+                        ).join();
+            }
+            catch (Exception e)
+            {
+                return error("message",e.getMessage());
+            }
+        });
+        this.tcpServer.addHandler(MessageHeaders.deleteMovieCascade,request->{
+            try{
+                return rentalService.deleteMovieCascade((int) request.getBody().get(0).getValue())
+                        .thenApply(
+                                client-> ok("message","movie deleted")
+                        ).exceptionally(
+                                err -> error("error" ,err.getMessage())
+                        ).join();
+            }
+            catch (Exception e)
+            {
+                return error("message",e.getMessage());
+            }
+        });
+        this.tcpServer.addHandler(MessageHeaders.deleteClientCascade,request->{
+            try{
+                return rentalService.deleteClientCascade((int) request.getBody().get(0).getValue())
+                        .thenApply(
+                                client-> ok("message","client deleted")
+                        ).exceptionally(
+                                err -> error("error" ,err.getMessage())
+                        ).join();
+            }
+            catch (Exception e)
+            {
+                return error("message",e.getMessage());
+            }
+        });
+
 
     }
 

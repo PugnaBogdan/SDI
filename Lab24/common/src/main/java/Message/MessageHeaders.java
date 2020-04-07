@@ -10,6 +10,22 @@ public enum MessageHeaders {
     updateClient,
     getClients,
     filterClientsId,
-    filterClientsName
+    filterClientsName,
+
+    //movies
+    getMovies,
+    addMovie,
+    deleteMovie,
+    updateMovie,
+    filterEvenId,
+    filterMoviesWithTitleLessThan,
+
+    //rentals
+    getAllRentals,
+    addRental,
+    updateRental,
+    deleteRent,
+    deleteClientCascade,
+    deleteMovieCascade
 }
 

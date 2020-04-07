@@ -14,8 +14,8 @@ import java.util.Set;
 public class ClientDBRepo implements  Repository<Integer, Client> {
 
     private static final String URL = "jdbc:postgresql://localhost:5432/movierental";
-    private static final String USER = "postgres";
-    private static final String PASSWORD = "password";
+    private static final String USER = System.getProperty("username");
+    private static final String PASSWORD = System.getProperty("password");
 
     @Override
     public Optional<Client> findOne(Integer integer) throws SQLException {

@@ -1,5 +1,6 @@
 package Controller;
 
+import Entities.Client;
 import Entities.Movie;
 import Entities.Validators.MovieValidator;
 import Entities.Validators.ValidatorException;
@@ -12,78 +13,108 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author Rares.
  */
-public class MovieController {
+public class MovieController implements MovieService {
 
     private Repository<Integer, Movie> repo;
     private MovieValidator validator;
+    private ExecutorService executorService;
 
-    public MovieController(Repository<Integer, Movie> initRepo) {
+    public MovieController(Repository<Integer, Movie> initRepo, ExecutorService executorService) {
         repo = initRepo;
         validator = new MovieValidator();
+        this.executorService = executorService;
     }
 
     public Optional<Movie> getById(Integer movieId) throws SQLException {
         return repo.findOne(movieId);
     }
 
-    public Set<Movie> getAllMovies() throws SQLException {
+    public CompletableFuture<Set<Movie>> getAllMovies() throws SQLException {
         Iterable<Movie> movies = repo.findAll();
-        return (Set<Movie>) movies;
+        return CompletableFuture.supplyAsync (()->{
+            return (Set<Movie>)movies;
+        },executorService);
+
     }
 
-    public void addMovie(Movie movieToAdd) throws ValidatorException {
-        try {
-            validator.validate(movieToAdd);
-            repo.save(movieToAdd);
-        } catch (ValidatorException v) {
-            throw new ValidatorException(v.getMessage());
-        } catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    @Override
+
+    public CompletableFuture<Void> addMovie(Movie movieToAdd) throws ValidatorException {
+        return CompletableFuture.supplyAsync(()->{
+            try
+            {
+                validator.validate(movieToAdd);
+                repo.save(movieToAdd);
+                return null;
+            }
+            catch(ValidatorException | NumberFormatException | ParserConfigurationException | TransformerException | SAXException | IOException | SQLException v)
+            {
+                throw new ValidatorException(v.getMessage());
+            }
+
+        },executorService);
     }
 
-    public void deleteMovie(Integer movieToDelete) throws ValidatorException{
-        try{
-            repo.delete(movieToDelete);
-        }
-        catch (ValidatorException v){
-            throw  new ValidatorException((v.getMessage()));
-        } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
-            e.printStackTrace();
-        }
+    public CompletableFuture<Void> deleteMovie(int movieToDelete) throws ValidatorException{
+        return CompletableFuture.supplyAsync(()-> {
+            try {
+                repo.delete(movieToDelete);
+            } catch (ValidatorException v) {
+                throw new ValidatorException((v.getMessage()));
+            } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
+                e.printStackTrace();
+            }
+            return null;
+        },executorService);
     }
 
-    public void updateMovie(Movie updatedMovie) {
-        try{
-            repo.update(updatedMovie);
+    public CompletableFuture<Void> updateMovie(Movie updatedMovie) {
+        return CompletableFuture.supplyAsync(()-> {
+            try {
+                repo.update(updatedMovie);
 
-        } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
-            e.printStackTrace();
-        }
+            } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
+                e.printStackTrace();
+            }
+            return null;
+        },executorService);
     }
 
-    public Set<Movie> filterEvenId() throws SQLException {
-        Set<Movie> all = (Set<Movie>) repo.findAll();
-        all.removeIf(movie->movie.getId()%2==0);
+    public CompletableFuture<Set<Movie>> filterEvenId() throws SQLException {
+        return CompletableFuture.supplyAsync(()-> {
+            Set<Movie> all = null;
+            try {
+                all = (Set<Movie>) repo.findAll();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            all.removeIf(movie -> movie.getId() % 2 == 0);
 
-        return all;
+            return all;
+        });
     }
 
     /*
     filters movies that have the title length less than some number
      */
 
-    public Set<Movie> filterMoviesWithTitleLessThan(int length) throws SQLException {
+    public CompletableFuture<Set<Movie>> filterMoviesWithTitleLessThan(int length) throws SQLException {
+        return CompletableFuture.supplyAsync(()-> {
+            Set<Movie> all = null;
+            try {
+                all = (Set<Movie>) repo.findAll();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            all.removeIf(movie -> movie.getTitle().length() > length);
 
-        Set<Movie> all = (Set<Movie>) repo.findAll();
-        all.removeIf(movie->movie.getTitle().length() < length);
-
-        return all;
+            return all;
+        });
     }
 }

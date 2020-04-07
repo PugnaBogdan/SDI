@@ -33,13 +33,13 @@ public class serverMain {
         ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         ClientService clientController = new ClientController(clientDB,executorService);
-        //MovieController movieController = new MovieController(movieDB);
-        //RentalController rentalController = new RentalController(rentalDB, clientController, movieController);
+        MovieService movieController = new MovieController(movieDB,executorService);
+        RentalService rentalController = new RentalController(rentalDB, clientController, movieController,executorService);
         //UserInterface ui = new UserInterface(clientController, movieController, rentalController);
         //ui.runConsole();
         TcpServer server = new TcpServer(executorService);
 
-        ServerController serverController = new ServerController(server,clientController);
+        ServerController serverController = new ServerController(server,clientController,movieController, rentalController);
         serverController.runServer();
     }
 }

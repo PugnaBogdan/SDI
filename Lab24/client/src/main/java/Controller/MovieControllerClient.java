@@ -1,164 +1,168 @@
 package Controller;
+
 import Entities.Client;
-import Entities.Validators.Validator;
+import Entities.Movie;
 import Entities.Validators.ValidatorException;
 import Message.Message;
 import Message.MessageHeaders;
+import org.xml.sax.SAXException;
 import tcp.TcpClient;
 
-
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
-public class ClientControllerClient implements ClientService {
+public class MovieControllerClient implements MovieService {
+
     private ExecutorService executorService;
     private TcpClient tcpClient;
 
 
-    public ClientControllerClient(ExecutorService executorService, TcpClient tcpClient) {
+    public MovieControllerClient(ExecutorService executorService, TcpClient tcpClient) {
         this.executorService = executorService;
         this.tcpClient = tcpClient;
     }
 
-
-    public CompletableFuture<Void> addClient(Client client) throws ValidatorException, IOException {
-        return CompletableFuture.supplyAsync(()->{
-            ArrayList<Map.Entry<String,Object>> body = new ArrayList<>();
-
-            System.out.println(client.toString());
-            body.add(new AbstractMap.SimpleEntry<>("client",client));
-
-            Message request = new Message(MessageHeaders.addClient,body);
-            Message response = tcpClient.sendAndReceive(request);
-            if(response.getHeader().equals(MessageHeaders.good))
-            {
-                return null;
-            }
-            else if(response.getHeader().equals(MessageHeaders.error))
-            {
-                throw new ValidatorException((String)response.getBody().get(0).getValue());
-            }else {
-            throw new ValidatorException("client side error?");
-        }
-        },executorService);
-    }
-
-    public CompletableFuture<Void> deleteClient(int id) throws ValidatorException, IOException {
-        return CompletableFuture.supplyAsync(()->{
-            ArrayList<Map.Entry<String,Object>> body = new ArrayList<>();
-
-            body.add(new AbstractMap.SimpleEntry<>("id",id));
-
-            Message request = new Message(MessageHeaders.deleteClient,body);
-            Message response = tcpClient.sendAndReceive(request);
-            if(response.getHeader().equals(MessageHeaders.good))
-            {
-                return null;
-            }
-            else if(response.getHeader().equals(MessageHeaders.error))
-            {
-                throw new ValidatorException((String)response.getBody().get(0).getValue());
-            }else {
-                throw new ValidatorException("client side error?");
-            }
-        },executorService);
-    }
-
-
-
-    public CompletableFuture<Void> updateClient(Client client) throws ValidatorException, IOException {
-        return CompletableFuture.supplyAsync(()->{
-            ArrayList<Map.Entry<String,Object>> body = new ArrayList<>();
-
-            System.out.println(client.toString());
-            body.add(new AbstractMap.SimpleEntry<>("client",client));
-
-            Message request = new Message(MessageHeaders.updateClient,body);
-            Message response = tcpClient.sendAndReceive(request);
-            if(response.getHeader().equals(MessageHeaders.good))
-            {
-                return null;
-            }
-            else if(response.getHeader().equals(MessageHeaders.error))
-            {
-                throw new ValidatorException((String)response.getBody().get(0).getValue());
-            }else {
-                throw new ValidatorException("client side error?");
-            }
-        },executorService);
-    }
-
-    public CompletableFuture<Set<Client>> getAllClients()
+    public CompletableFuture<Set<Movie>> getAllMovies()
     {
         return CompletableFuture.supplyAsync(()->
         {
-            Message request = new Message(MessageHeaders.getClients,null);
+            Message request = new Message(MessageHeaders.getMovies,null);
             Message response = tcpClient.sendAndReceive(request);
             if(response.getHeader().equals(MessageHeaders.good))
             {
 
-                    return(Set<Client>)(response.getBody().get(0).getValue());
+                return(Set<Movie>)(response.getBody().get(0).getValue());
 
             }else if(response.getHeader().equals(MessageHeaders.error))
             {
                 throw new ValidatorException((String)response.getBody().get(0).getValue());
             }
             else {
-                throw new ValidatorException("client side error?");
-            }
-        },executorService);
-    }
-
-    public CompletableFuture<Set<Client>> filterClientsId()
-    {
-        return CompletableFuture.supplyAsync(()->
-        {
-            Message request = new Message(MessageHeaders.filterClientsId,null);
-            Message response = tcpClient.sendAndReceive(request);
-            if(response.getHeader().equals(MessageHeaders.good))
-            {
-
-                return(Set<Client>)(response.getBody().get(0).getValue());
-
-            }else if(response.getHeader().equals(MessageHeaders.error))
-            {
-                throw new ValidatorException((String)response.getBody().get(0).getValue());
-            }
-            else {
-                throw new ValidatorException("client side error?");
-            }
-        },executorService);
-    }
-
-    public CompletableFuture<Set<Client>> filterClientsName(int id)
-    {
-        return CompletableFuture.supplyAsync(()->
-        {
-            ArrayList<Map.Entry<String,Object>> body = new ArrayList<>();
-            body.add(new AbstractMap.SimpleEntry<>("id",id));
-
-            Message request = new Message(MessageHeaders.filterClientsName,body);
-            Message response = tcpClient.sendAndReceive(request);
-            if(response.getHeader().equals(MessageHeaders.good))
-            {
-
-                return(Set<Client>)(response.getBody().get(0).getValue());
-
-            }else if(response.getHeader().equals(MessageHeaders.error))
-            {
-                throw new ValidatorException((String)response.getBody().get(0).getValue());
-            }
-            else {
-                throw new ValidatorException("client side error?");
+                throw new ValidatorException("Movie side error?");
             }
         },executorService);
     }
 
     @Override
-    public Optional<Client> getById(Integer clientId) throws SQLException {
+    public CompletableFuture<Void> addMovie(Movie movie) throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException, SQLException {
+        return CompletableFuture.supplyAsync(()->{
+            ArrayList<Map.Entry<String,Object>> body = new ArrayList<>();
+
+            System.out.println(movie.toString());
+            body.add(new AbstractMap.SimpleEntry<>("movie",movie));
+
+            Message request = new Message(MessageHeaders.addMovie,body);
+            Message response = tcpClient.sendAndReceive(request);
+            if(response.getHeader().equals(MessageHeaders.good))
+            {
+                return null;
+            }
+            else if(response.getHeader().equals(MessageHeaders.error))
+            {
+                throw new ValidatorException((String)response.getBody().get(0).getValue());
+            }else {
+                throw new ValidatorException("Movie side error?");
+            }
+        },executorService);
+    }
+
+    @Override
+    public CompletableFuture<Void> updateMovie(Movie movie) throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException, SQLException {
+        return CompletableFuture.supplyAsync(()->{
+            ArrayList<Map.Entry<String,Object>> body = new ArrayList<>();
+
+            System.out.println(movie.toString());
+            body.add(new AbstractMap.SimpleEntry<>("movie",movie));
+
+            Message request = new Message(MessageHeaders.updateMovie,body);
+            Message response = tcpClient.sendAndReceive(request);
+            if(response.getHeader().equals(MessageHeaders.good))
+            {
+                return null;
+            }
+            else if(response.getHeader().equals(MessageHeaders.error))
+            {
+                throw new ValidatorException((String)response.getBody().get(0).getValue());
+            }else {
+                throw new ValidatorException("movie side error?");
+            }
+        },executorService);
+    }
+
+    @Override
+    public CompletableFuture<Void> deleteMovie(int id) throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException, SQLException {
+        return CompletableFuture.supplyAsync(()->{
+            ArrayList<Map.Entry<String,Object>> body = new ArrayList<>();
+
+            body.add(new AbstractMap.SimpleEntry<>("id",id));
+
+            Message request = new Message(MessageHeaders.deleteMovie,body);
+            Message response = tcpClient.sendAndReceive(request);
+            if(response.getHeader().equals(MessageHeaders.good))
+            {
+                return null;
+            }
+            else if(response.getHeader().equals(MessageHeaders.error))
+            {
+                throw new ValidatorException((String)response.getBody().get(0).getValue());
+            }else {
+                throw new ValidatorException("Movie side error?");
+            }
+        },executorService);
+    }
+
+    @Override
+    public CompletableFuture<Set<Movie>> filterEvenId(){
+        return CompletableFuture.supplyAsync(()->
+        {
+            Message request = new Message(MessageHeaders.filterEvenId,null);
+            Message response = tcpClient.sendAndReceive(request);
+            if(response.getHeader().equals(MessageHeaders.good))
+            {
+
+                return(Set<Movie>)(response.getBody().get(0).getValue());
+
+            }else if(response.getHeader().equals(MessageHeaders.error))
+            {
+                throw new ValidatorException((String)response.getBody().get(0).getValue());
+            }
+            else {
+                throw new ValidatorException("movie side error?");
+            }
+        },executorService);
+    }
+
+    @Override
+    public CompletableFuture<Set<Movie>> filterMoviesWithTitleLessThan(int length) {
+        return CompletableFuture.supplyAsync(()->
+        {
+            ArrayList<Map.Entry<String,Object>> body = new ArrayList<>();
+            body.add(new AbstractMap.SimpleEntry<>("length",length));
+
+            Message request = new Message(MessageHeaders.filterMoviesWithTitleLessThan,body);
+            Message response = tcpClient.sendAndReceive(request);
+            if(response.getHeader().equals(MessageHeaders.good))
+            {
+
+                return(Set<Movie>)(response.getBody().get(0).getValue());
+
+            }else if(response.getHeader().equals(MessageHeaders.error))
+            {
+                throw new ValidatorException((String)response.getBody().get(0).getValue());
+            }
+            else {
+                throw new ValidatorException("movie side error?");
+            }
+        },executorService);
+    }
+
+    @Override
+    public Optional<Movie> getById(Integer movieId) throws SQLException {
         return Optional.empty();
     }
 
