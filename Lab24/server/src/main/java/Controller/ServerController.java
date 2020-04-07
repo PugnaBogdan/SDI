@@ -340,6 +340,27 @@ public class ServerController {
                     return request;
                 }
         );
+        this.tcpServer.addHandler(MessageHeaders.getRentedMoviesOfMostActiveClient,
+                request ->
+                {
+                    try {
+                        return this.rentalService.getRentedMoviesOfMostActiveClient()
+                                .thenApply(
+                                        rentals -> {
+                                            Message response = new Message(MessageHeaders.good, new ArrayList<>());
+                                            response.getBody().add(new AbstractMap.SimpleEntry<>("most rented movies for client", rentals));
+                                            return response;
+                                        }
+                                )
+                                .exceptionally(
+                                        e -> error("message", e.getMessage())
+                                ).join();
+                    } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
+                        e.printStackTrace();
+                    }
+                    return request;
+                }
+        );
         this.tcpServer.addHandler(MessageHeaders.addRental,request->{
             try{
                 return rentalService.addRental((RentAction) request.getBody().get(0).getValue())

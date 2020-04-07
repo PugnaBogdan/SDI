@@ -21,4 +21,5 @@ public interface RentalService {
     CompletableFuture<Void> deleteMovieCascade(int movieToDelete)throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException,SQLException;
     CompletableFuture<List<Integer>> getMostActiveClient() throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException,SQLException;
     CompletableFuture<List<Integer>> getMostRentedMovie()throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException,SQLException;
+    CompletableFuture<List<String>> getRentedMoviesOfMostActiveClient() throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException,SQLException;
 }

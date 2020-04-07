@@ -174,6 +174,7 @@ public class RentalController implements RentalService{
         });
     }
 
+
     public void updateTheReports() throws SQLException {
         mostRentedMovie = new HashMap<Integer,Integer>();
         mostActiveClient = new HashMap<Integer,Integer>();
@@ -221,7 +222,7 @@ public class RentalController implements RentalService{
         else
             mostRentedMovie.putIfAbsent(movieKey,1);
 
-         //rentalOfMostActive = getRentedMoviesOfMostActiveClient();
+         rentalOfMostActive =  getRentedMoviesOfMostActiveClient();
     }
 
 

@@ -355,6 +355,19 @@ public class UserInterface {
         );
 
     }
+    public void allRaports(String[] arguments) throws SQLException, ParserConfigurationException, TransformerException, SAXException, IOException {
+        rentalController.getRentedMoviesOfMostActiveClient().thenAccept(
+                result-> {
+                    result.forEach(System.out::println);
+                }
+        ).exceptionally(
+                error->{
+                    System.out.println(error.getMessage());
+                    return null;
+                }
+        );
+
+    }
 
     public void run() throws SQLException, ParserConfigurationException, SAXException, IOException, TransformerException {
         String command;
@@ -442,6 +455,9 @@ public class UserInterface {
                         mostActiveClient(arguments);
                     }
                     else if(arguments[1].equals("rented")){
+                        mostRentedMovies(arguments);
+                    }
+                    else if(arguments[1].equals("all")){
                         mostRentedMovies(arguments);
                     }
                     else {
