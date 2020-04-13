@@ -19,12 +19,19 @@ public class clientMain {
                         "clientConfig"
                 );
 
-        ClientService clientService = context.getBean(ClientService.class);
+        try {
+            ClientService clientService = context.getBean(ClientService.class);
+            UserInterface console = new UserInterface(clientService);
+
+            console.run();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         //MovieControllerClient movieService = new MovieControllerClient();
         //RentalControllerClient rentalService = new RentalControllerClient();
 
-        UserInterface console = new UserInterface(clientService);
 
-        console.run();
     }
 }

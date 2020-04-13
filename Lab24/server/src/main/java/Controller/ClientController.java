@@ -3,7 +3,6 @@ package Controller;
 import Entities.Client;
 import Entities.Validators.ClientValidator;
 import Entities.Validators.ValidatorException;
-import Repository.Repository;
 import Repository.SpringDB.ClientSpringDBRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.xml.sax.SAXException;
@@ -15,28 +14,26 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
 
 /**
  * @author Rares.
  */
 public class ClientController implements ClientService {
     @Autowired
-    private ClientSpringDBRepo repo;
+    private ClientSpringDBRepo clientRepo;
 
     @Autowired
-    private ClientValidator validator;
+    private ClientValidator clientValidator;
 
 
 
 
     public Optional<Client> getById(Integer clientId) throws SQLException {
-        return repo.findOne(clientId);
+        return clientRepo.findOne(clientId);
     }
 
     public Set<Client> getAllClients() throws SQLException {
-        Iterable<Client> clients = repo.findAll();
+        Iterable<Client> clients = clientRepo.findAll();
         Set<Client> set = new HashSet<>();
 
         clients.forEach(set::add);
@@ -47,8 +44,8 @@ public class ClientController implements ClientService {
 
         try
         {
-            validator.validate(clientToSave);
-            repo.save(clientToSave);
+            clientValidator.validate(clientToSave);
+            clientRepo.save(clientToSave);
         }
         catch(ValidatorException | NumberFormatException | ParserConfigurationException | TransformerException | SAXException | IOException | SQLException v)
         {
@@ -62,7 +59,7 @@ public class ClientController implements ClientService {
 
 
         try{
-            repo.update(UpdatedClient);
+            clientRepo.update(UpdatedClient);
 
         } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
             e.printStackTrace();
@@ -75,7 +72,7 @@ public class ClientController implements ClientService {
     public void deleteClient(int clientToDelete) throws ValidatorException {
 
         try {
-            repo.delete(clientToDelete);
+            clientRepo.delete(clientToDelete);
         } catch (ValidatorException v) {
             throw new ValidatorException((v.getMessage()));
         } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
@@ -90,7 +87,7 @@ public class ClientController implements ClientService {
 
            Set<Client> all = new HashSet<>();
            try {
-               Iterable<Client> clients = repo.findAll();
+               Iterable<Client> clients = clientRepo.findAll();
                clients.forEach(all::add);
            } catch (SQLException e) {
                e.printStackTrace();
@@ -109,7 +106,7 @@ public class ClientController implements ClientService {
 
             Set<Client> all = new HashSet<>();
             try {
-                Iterable<Client> clients = repo.findAll();
+                Iterable<Client> clients = clientRepo.findAll();
                 clients.forEach(all::add);
                 all.removeIf(client->client.getName().length() < length);
             } catch (SQLException e) {
