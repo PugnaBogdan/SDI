@@ -1,11 +1,9 @@
 package Ui;
 
-import Controller.ClientControllerClient;
+import Controller.ClientService;
 import Controller.MovieControllerClient;
 import Controller.RentalControllerClient;
 import Entities.Client;
-import Entities.Movie;
-import Entities.RentAction;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -15,18 +13,19 @@ import java.io.InterruptedIOException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Scanner;
+import java.util.Set;
 
 
 public class UserInterface {
-    private ClientControllerClient clientController;
+    private ClientService clientService;
     private MovieControllerClient movieController;
     private RentalControllerClient rentalController;
     private static Scanner input = new Scanner(System.in);
 
-    public UserInterface(ClientControllerClient clientController, MovieControllerClient movieService, RentalControllerClient rentalService) {
-        this.clientController = clientController;
-        this.movieController = movieService;
-        this.rentalController = rentalService;
+    public UserInterface(ClientService clientController) {
+        this.clientService = clientController;
+        //this.movieController = movieService;
+        //this.rentalController = rentalService;
     }
 
 
@@ -34,14 +33,8 @@ public class UserInterface {
     {
         try{
             Client newClient = new Client(Integer.parseInt(arguments[2]),arguments[3],Integer.parseInt(arguments[4]));
-            this.clientController.addClient(newClient).thenAccept(
-                    response -> System.out.println("Client added")
-            ).exceptionally(
-                    er -> {
-                        System.out.println(er.getMessage());
-                        return null;
-                    }
-            );
+            this.clientService.addClient(newClient);
+            System.out.println("Client added!");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -51,14 +44,9 @@ public class UserInterface {
     {
         try{
             Client newClient = new Client(Integer.parseInt(arguments[2]),arguments[3],Integer.parseInt(arguments[4]));
-            this.clientController.updateClient(newClient).thenAccept(
-                    response -> System.out.println("Client update")
-            ).exceptionally(
-                    er -> {
-                        System.out.println(er.getMessage());
-                        return null;
-                    }
-            );
+            this.clientService.updateClient(newClient);
+            System.out.println("Client updated");
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -68,15 +56,9 @@ public class UserInterface {
         try
         {
             int id = Integer.parseInt(arguments[2]);
-            clientController.deleteClient(id).thenAccept(
-                    response -> System.out.println("Client deleted")
-            ).exceptionally(
-                    error->
-                    {
-                        System.out.println(error.getMessage());
-                        return null;
-                    }
-            );
+            clientService.deleteClient(id);
+            System.out.println("Client deleted");
+
         }catch(Exception e)
         {
             e.printStackTrace();
@@ -84,52 +66,43 @@ public class UserInterface {
     }
 
 
-    public void printClients(String[] arguments)
-    {
-        clientController.getAllClients().thenAccept(
-                result-> {
-                    result.forEach(System.out::println);
-                }
-        ).exceptionally(
-                error->{
-                    System.out.println(error.getMessage());
-                    return null;
-                }
-        );
+    public void printClients(String[] arguments) {
+        try{
+            Set<Client> clients = clientService.getAllClients();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
     }
 
     public void filterClientsId(String[] arguments)
     {
-        clientController.filterClientsId().thenAccept(
-                result-> {
-                    result.forEach(System.out::println);
-                }
-        ).exceptionally(
-                error->{
-                    System.out.println(error.getMessage());
-                    return null;
-                }
-        );
+        try{
+            Set<Client> clients = clientService.filterClientsId();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     public void filterClientsName(String[] arguments)
     {
 
         int length = Integer.parseInt(arguments[3]);
-        clientController.filterClientsName(length).thenAccept(
-                result-> {
-                    result.forEach(System.out::println);
-                }
-        ).exceptionally(
-                error->{
-                    System.out.println(error.getMessage());
-                    return null;
-                }
-        );
+        try{
+            Set<Client> clients = clientService.filterClientsName(length);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     /// MOVIES ------------------------------------------------
-
+    /*
     public void addMovie(String[] arguments)
     {
         try{
@@ -369,6 +342,8 @@ public class UserInterface {
 
     }
 
+
+     */
     public void run() throws SQLException, ParserConfigurationException, SAXException, IOException, TransformerException {
         String command;
         try {
@@ -381,10 +356,10 @@ public class UserInterface {
                         addClient(arguments);
                     }
                     else if(arguments[1].equals("movie")){
-                        addMovie(arguments);
+                       // addMovie(arguments);
                     }
                     else if(arguments[1].equals("rent")){
-                        addRent(arguments);
+                        //addRent(arguments);
                     }
                     else {
                         System.out.println("idk who's that ¯\\_(ツ)_/¯");
@@ -393,9 +368,9 @@ public class UserInterface {
                     if (arguments[1].equals("clients")) {
                         printClients(arguments);
                     } else if (arguments[1].equals("movies")) {
-                        printMovies(arguments);
+                        //printMovies(arguments);
                     } else if (arguments[1].equals("rents")) {
-                        printRents(arguments);
+                        //printRents(arguments);
                     }else {
                         System.out.println("idk who's that ¯\\_(ツ)_/¯");
                     }
@@ -404,10 +379,10 @@ public class UserInterface {
                         updateClient(arguments);
                     }
                     else if(arguments[1].equals("movie")){
-                        updateMovie(arguments);
+                       // updateMovie(arguments);
                     }
                     else if(arguments[1].equals("rent")){
-                        updateRent(arguments);
+                       // updateRent(arguments);
                     }
                     else {
                         System.out.println("idk who's that ¯\\_(ツ)_/¯");
@@ -417,10 +392,10 @@ public class UserInterface {
                         deleteClient(arguments);
                     }
                     else if(arguments[1].equals("movie")){
-                        deleteMovie(arguments);
+                        //deleteMovie(arguments);
                     }
                     else if(arguments[1].equals("rent")){
-                        deleteRent(arguments);
+                       // deleteRent(arguments);
                     }
                     else {
                         System.out.println("idk who's that ¯\\_(ツ)_/¯");
@@ -437,10 +412,10 @@ public class UserInterface {
                     }
                     else if(arguments[1].equals("movie")){
                         if(arguments[2].equals("id")){
-                            filterEvenId(arguments);
+                           // filterEvenId(arguments);
                         }
                         else if(arguments[2].equals("title")){
-                            filterMovieWithTitleLessThen(arguments);
+                           // filterMovieWithTitleLessThen(arguments);
                         }
                         else {
                             System.out.println("can't filter with that, sorry");
@@ -453,13 +428,13 @@ public class UserInterface {
                 else if (arguments[0].equals("raport")){
 
                     if (arguments[1].equals("active")){
-                        mostActiveClient(arguments);
+                        //mostActiveClient(arguments);
                     }
                     else if(arguments[1].equals("rented")){
-                        mostRentedMovies(arguments);
+                        //mostRentedMovies(arguments);
                     }
                     else if(arguments[1].equals("all")){
-                        allRaports(arguments);
+                        //allRaports(arguments);
                     }
                     else {
                         System.out.println("can't filter with that, sorry");

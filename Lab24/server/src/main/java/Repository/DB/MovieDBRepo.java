@@ -1,6 +1,7 @@
-package Repository;
+package Repository.DB;
 
-import Entities.RentAction;
+import Entities.Movie;
+import Repository.Repository;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -11,67 +12,65 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-public class RentalDBRepo implements  Repository<Integer, RentAction> {
+public class MovieDBRepo implements Repository<Integer, Movie> {
 
     private static final String URL = "jdbc:postgresql://localhost:5432/movierental";
     private static final String USER = System.getProperty("username");
     private static final String PASSWORD = System.getProperty("password");
 
     @Override
-    public Optional<RentAction> findOne(Integer integer) throws SQLException {
-
-        RentAction r = new RentAction();
-        String sql = "select rentId,clientId,movieId from rentals";
+    public Optional<Movie> findOne(Integer integer) throws SQLException {
+        Movie m = new Movie();
+        String sql = "select movieid,title,price from movie";
 
         Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
         PreparedStatement preparedStatement =
                 connection.prepareStatement(sql);
 
         ResultSet result = preparedStatement.executeQuery();
+        result.next();
 
-        int rentId = result.getInt("rentId");
-        int clientId = result.getInt("clientId");
         int movieId = result.getInt("movieId");
+        String title = result.getString("title");
+        int price = result.getInt("price");
 
-        r.setRentId(rentId);
-        r.setClientId(clientId);
-        r.setMovieId(movieId);
+        m.setMovieId(movieId);
+        m.setTitle(title);
+        m.setPrice(price);
 
-        return Optional.of(r);
+        return Optional.of(m);
     }
 
     @Override
-    public Iterable<RentAction> findAll() throws SQLException {
-        Set<RentAction> all = new HashSet<RentAction>();
-        String sql = "select * from rentals";
+    public Iterable<Movie> findAll() throws SQLException {
+        Set<Movie> all = new HashSet<Movie>();
+        String sql = "select * from movie";
         Connection connection = DriverManager.getConnection(URL,USER,PASSWORD);
         PreparedStatement statement = connection.prepareStatement(sql);
 
         ResultSet result = statement.executeQuery();
         while(result.next())
         {
-            int rentId = result.getInt("rentId");
-            int clientId = result.getInt("clientId");
             int movieId = result.getInt("movieId");
+            String title = result.getString("title");
+            int price = result.getInt("price");
 
-            all.add(new RentAction(rentId,clientId,movieId));
+            all.add(new Movie(movieId,title,price));
         }
 
         return all;
-
     }
 
     @Override
-    public Optional<RentAction> save(RentAction entity) throws ParserConfigurationException, TransformerException, SAXException, IOException, SQLException {
-
-        String sql = "insert into rentals (rentId,clientId,movieId) values(?,?,?)";
+    public Optional<Movie> save(Movie entity) throws ParserConfigurationException, TransformerException, SAXException, IOException, SQLException {
+        String sql = "insert into movie (movieid,title,price) values(?,?,?)";
 
         Connection connection = DriverManager.getConnection(URL,USER,PASSWORD);
         PreparedStatement statement = connection.prepareStatement(sql);
 
-        statement.setInt(1,entity.getRentId());
-        statement.setInt(2,entity.getClientId());
-        statement.setInt(3,entity.getMovieId());
+        statement.setInt(1,entity.getId());
+        statement.setString(2,entity.getTitle());
+        statement.setInt(3,entity.getPrice());
 
         statement.executeUpdate();
 
@@ -79,9 +78,8 @@ public class RentalDBRepo implements  Repository<Integer, RentAction> {
     }
 
     @Override
-    public Optional<RentAction> delete(Integer integer) throws ParserConfigurationException, IOException, SAXException, TransformerException, SQLException {
-
-        String sql = "delete from rentals where rentId=?";
+    public Optional<Movie> delete(Integer integer) throws ParserConfigurationException, IOException, SAXException, TransformerException, SQLException {
+        String sql = "delete from movie where movieid=?";
         Connection connection = DriverManager.getConnection(URL,USER,PASSWORD);
         PreparedStatement statement = connection.prepareStatement(sql);
 
@@ -93,15 +91,14 @@ public class RentalDBRepo implements  Repository<Integer, RentAction> {
     }
 
     @Override
-    public Optional<RentAction> update(RentAction entity) throws ParserConfigurationException, TransformerException, SAXException, IOException, SQLException {
-
-        String sql = "update rentals set clientId=?, movieId=? where rentId=?";
+    public Optional<Movie> update(Movie entity) throws ParserConfigurationException, TransformerException, SAXException, IOException, SQLException {
+        String sql = "update movie set title=?, price=? where movieid=?";
         Connection connection = DriverManager.getConnection(URL,USER,PASSWORD);
         PreparedStatement statement = connection.prepareStatement(sql);
 
-        statement.setInt(1,entity.getClientId());
-        statement.setInt(2,entity.getMovieId());
-        statement.setInt(3,entity.getRentId());
+        statement.setString(1,entity.getTitle());
+        statement.setInt(2,entity.getPrice());
+        statement.setInt(3,entity.getId());
 
         statement.executeUpdate();
 

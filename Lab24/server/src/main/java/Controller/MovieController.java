@@ -11,6 +11,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -37,8 +38,10 @@ public class MovieController implements MovieService {
 
     public CompletableFuture<Set<Movie>> getAllMovies() throws SQLException {
         Iterable<Movie> movies = repo.findAll();
+        Set<Movie> set = new HashSet<>();
         return CompletableFuture.supplyAsync (()->{
-            return (Set<Movie>)movies;
+            movies.forEach(set::add);
+            return set;
         },executorService);
 
     }
@@ -88,9 +91,10 @@ public class MovieController implements MovieService {
 
     public CompletableFuture<Set<Movie>> filterEvenId() throws SQLException {
         return CompletableFuture.supplyAsync(()-> {
-            Set<Movie> all = null;
+            Set<Movie> all = new HashSet<>();
             try {
-                all = (Set<Movie>) repo.findAll();
+                Iterable<Movie> movies = repo.findAll();
+                movies.forEach(all::add);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -106,9 +110,10 @@ public class MovieController implements MovieService {
 
     public CompletableFuture<Set<Movie>> filterMoviesWithTitleLessThan(int length) throws SQLException {
         return CompletableFuture.supplyAsync(()-> {
-            Set<Movie> all = null;
+            Set<Movie> all = new HashSet<>();
             try {
-                all = (Set<Movie>) repo.findAll();
+                Iterable<Movie> movies = repo.findAll();
+                movies.forEach(all::add);
             } catch (SQLException e) {
                 e.printStackTrace();
             }

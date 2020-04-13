@@ -1,7 +1,8 @@
-package Repository;
+package Repository.File;
 
 import Entities.RentAction;
 import Entities.Validators.ValidatorException;
+import Repository.Repository;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -16,11 +17,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import Repository.InMemoryRepository;
 
 /**
  * @author Pugna
  */
-public class RentalFileRepository extends InMemoryRepository<Integer, RentAction>{
+public class RentalFileRepository extends InMemoryRepository<Integer, RentAction> {
     private String fileName;
 
     public RentalFileRepository( String fileName) {
