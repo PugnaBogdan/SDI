@@ -27,7 +27,7 @@ public class JdbcConfig {
 
         basicDataSource.setUrl("jdbc:postgresql://localhost:5432/movierental");
         basicDataSource.setUsername("postgres");
-        basicDataSource.setPassword("admin");
+        basicDataSource.setPassword("password");
         basicDataSource.setInitialSize(2);
 
         return basicDataSource;

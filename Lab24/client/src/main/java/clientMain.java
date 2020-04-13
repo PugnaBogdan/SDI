@@ -16,7 +16,7 @@ public class clientMain {
 
         AnnotationConfigApplicationContext context =
                 new AnnotationConfigApplicationContext(
-                        "client.clientConfig"
+                        "clientConfig"
                 );
 
         ClientService clientService = context.getBean(ClientService.class);

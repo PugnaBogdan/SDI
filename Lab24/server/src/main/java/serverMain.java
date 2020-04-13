@@ -30,7 +30,7 @@ public class serverMain {
         System.out.println("server working");
         AnnotationConfigApplicationContext context =
                 new AnnotationConfigApplicationContext(
-                        "server.Config"
+                        "Config"
                 );
 
 

@@ -4,6 +4,7 @@ import Controller.ClientService;
 import Controller.MovieControllerClient;
 import Controller.RentalControllerClient;
 import Entities.Client;
+import org.w3c.dom.ls.LSOutput;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -69,6 +70,7 @@ public class UserInterface {
     public void printClients(String[] arguments) {
         try{
             Set<Client> clients = clientService.getAllClients();
+            clients.forEach(System.out::println);
         }
         catch (Exception e)
         {

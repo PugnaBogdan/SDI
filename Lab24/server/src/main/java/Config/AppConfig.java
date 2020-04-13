@@ -23,13 +23,12 @@ public class AppConfig {
         rmiServiceExporter.setServiceName("ClientService");
         rmiServiceExporter.setServiceInterface(ClientService.class);
         rmiServiceExporter.setService(serverClientService());
-        rmiServiceExporter.setRegistryPort(1099);
         return rmiServiceExporter;
     }
 
 
     @Bean
-    ClientService serverClientService(){
+    ServerControllerClient serverClientService(){
         return new ServerControllerClient();
     }
 
