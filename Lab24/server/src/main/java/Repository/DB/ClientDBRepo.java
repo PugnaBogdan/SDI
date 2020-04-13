@@ -1,6 +1,7 @@
-package Repository;
+package Repository.DB;
 
 import Entities.Client;
+import Repository.Repository;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;

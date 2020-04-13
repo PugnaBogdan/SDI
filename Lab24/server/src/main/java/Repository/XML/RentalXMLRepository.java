@@ -1,8 +1,9 @@
-package Repository;
+package Repository.XML;
 
 import Entities.Client;
-import Entities.Movie;
+import Entities.RentAction;
 import Entities.Validators.ValidatorException;
+import Repository.Repository;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -24,26 +25,27 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import Repository.InMemoryRepository;
 
-public class MovieXMLRepository  extends InMemoryRepository<Integer, Movie>   {
+public class RentalXMLRepository extends InMemoryRepository<Integer, RentAction> {
     private String fileName;
 
-    public MovieXMLRepository( String fileName) throws IOException, SAXException, ParserConfigurationException {
+    public RentalXMLRepository( String fileName) throws IOException, SAXException, ParserConfigurationException {
         this.fileName = fileName;
         loadData();
     }
 
-    private static Movie createMovieFromElement(Element clientElement){
-        Movie mov = new Movie();
-        String id = clientElement.getAttribute("Id");
-        mov.setMovieId(Integer.parseInt(id));
-        Node nameNode = clientElement.getElementsByTagName("Title").item(0);
-        String name = nameNode.getTextContent();
-        mov.setTitle(name);
-        Node ageNode = clientElement.getElementsByTagName("Price").item(0);
-        String age = ageNode.getTextContent();
-        mov.setPrice(Integer.parseInt(age));
-        return mov;
+    private static RentAction createRentalFromElement(Element clientElement){
+        RentAction rentAction = new RentAction();
+        String rentId = clientElement.getAttribute("Id");
+        rentAction.setRentId(Integer.parseInt(rentId));
+        Node clientNode = clientElement.getElementsByTagName("ClientId").item(0);
+        String clientId = clientNode.getTextContent();
+        rentAction.setClientId(Integer.parseInt(clientId));
+        Node movieNode = clientElement.getElementsByTagName("MovieId").item(0);
+        String movieId = movieNode.getTextContent();
+        rentAction.setMovieId(Integer.parseInt(movieId));
+        return rentAction;
     }
 
     private void loadData() throws ParserConfigurationException, IOException, SAXException {
@@ -61,11 +63,11 @@ public class MovieXMLRepository  extends InMemoryRepository<Integer, Movie>   {
                 .range(0, children.getLength())
                 .mapToObj(children::item)
                 .filter(node -> node instanceof Element)
-                .map(node -> createMovieFromElement((Element) node))
+                .map(node -> createRentalFromElement((Element) node))
                 .collect(Collectors.toList())
-                .forEach(movie -> {
+                .forEach(rental -> {
                     try {
-                        super.save(movie);
+                        super.save(rental);
                     } catch (ParserConfigurationException | TransformerException | SAXException | IOException e) {
                         e.printStackTrace();
                     }
@@ -73,14 +75,14 @@ public class MovieXMLRepository  extends InMemoryRepository<Integer, Movie>   {
 
     }
 
-    public void saveToFile(Movie movie) throws ParserConfigurationException, IOException, SAXException, TransformerException {
+    public void saveToFile(RentAction rentAction) throws ParserConfigurationException, IOException, SAXException, TransformerException {
         Document document = DocumentBuilderFactory
                 .newInstance()
                 .newDocumentBuilder()
                 .parse(this.fileName);
 
         Element root = document.getDocumentElement();
-        Node clientNode = movieToNode(movie, document);
+        Node clientNode = rentToNode(rentAction, document);
         root.appendChild(clientNode);
 
         Transformer transformer= TransformerFactory
@@ -92,38 +94,39 @@ public class MovieXMLRepository  extends InMemoryRepository<Integer, Movie>   {
                 new StreamResult(new File(this.fileName)));
     }
 
-    public static Node movieToNode(Movie movie, Document document){
-        Element clientElement = document.createElement("Movie");
-        clientElement.setAttribute("Id", Integer.toString(movie.getId()));
-        Element nameElement = document.createElement("Title");
-        nameElement.setTextContent(movie.getTitle());
+    public static Node rentToNode(RentAction rent, Document document){
+        Element clientElement = document.createElement("Rent");
+        clientElement.setAttribute("Id", Integer.toString(rent.getRentId()));
+        Element nameElement = document.createElement("ClientId");
+        nameElement.setTextContent(Integer.toString(rent.getClientId()));
         clientElement.appendChild(nameElement);
-        Element ageElement = document.createElement("Price");
-        ageElement.setTextContent(Integer.toString(movie.getPrice()));
+        Element ageElement = document.createElement("MovieId");
+        ageElement.setTextContent(Integer.toString(rent.getMovieId()));
         clientElement.appendChild(ageElement);
         return clientElement;
     }
 
     @Override
-    public Optional<Movie> save(Movie entity) throws ValidatorException, ParserConfigurationException, TransformerException, SAXException, IOException {
-        Optional<Movie> optional = super.save(entity);
+    public Optional<RentAction> save(RentAction entity) throws ValidatorException, ParserConfigurationException, TransformerException, SAXException, IOException {
+        Optional<RentAction> optional = super.save(entity);
         if (optional.isPresent()) {
-            throw new ValidatorException("Movie already exists!");
+            throw new ValidatorException("Client already exists!");
 
         }
         saveToFile(entity);
         return Optional.empty();
     }
 
+
     @Override
-    public Optional<Movie> delete(Integer integer) throws ParserConfigurationException, TransformerException, SAXException, IOException {
-        Optional<Movie> optional = super.delete(integer);
+    public Optional<RentAction> delete(Integer integer) throws ParserConfigurationException, TransformerException, SAXException, IOException {
+        Optional<RentAction> optional = super.delete(integer);
         redoFile() ;
         return Optional.empty();
     }
 
     @Override
-    public Optional<Movie> update(Movie entity) throws ParserConfigurationException, TransformerException, SAXException, IOException {
+    public Optional<RentAction> update(RentAction entity) throws ParserConfigurationException, TransformerException, SAXException, IOException {
         super.update(entity);
         redoFile();
         return Optional.empty();
@@ -136,11 +139,11 @@ public class MovieXMLRepository  extends InMemoryRepository<Integer, Movie>   {
                 .newDocumentBuilder()
                 .newDocument();
 
-        Element root = document.createElement("MovieRep");
+        Element root = document.createElement("RentRep");
         document.appendChild(root);
-        super.findAll().forEach(Movie -> {
-            Node movie = movieToNode(Movie,document);
-            root.appendChild(movie);
+        super.findAll().forEach(rentAction -> {
+            Node rent = rentToNode(rentAction,document);
+            root.appendChild(rent);
         });
 
         Transformer transformer = TransformerFactory.

@@ -1,9 +1,8 @@
-import Controller.ClientControllerClient;
-import Controller.MovieControllerClient;
-import Controller.RentalControllerClient;
+
+import Controller.ClientService;
 import Ui.UserInterface;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.xml.sax.SAXException;
-import tcp.TcpClient;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -15,14 +14,16 @@ import java.util.concurrent.Executors;
 public class clientMain {
     public static void main(String args[]) throws SQLException, TransformerException, ParserConfigurationException, SAXException, IOException {
 
-        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        TcpClient tcpClient = new TcpClient();
+        AnnotationConfigApplicationContext context =
+                new AnnotationConfigApplicationContext(
+                        "client.clientConfig"
+                );
 
-        ClientControllerClient clientService = new ClientControllerClient(executorService, tcpClient);
-        MovieControllerClient movieService = new MovieControllerClient(executorService, tcpClient);
-        RentalControllerClient rentalService = new RentalControllerClient(executorService,tcpClient);
+        ClientService clientService = context.getBean(ClientService.class);
+        //MovieControllerClient movieService = new MovieControllerClient();
+        //RentalControllerClient rentalService = new RentalControllerClient();
 
-        UserInterface console = new UserInterface(clientService,movieService,rentalService);
+        UserInterface console = new UserInterface(clientService);
 
         console.run();
     }

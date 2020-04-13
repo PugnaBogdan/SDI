@@ -1,7 +1,8 @@
-package Repository;
+package Repository.File;
 
 import Entities.Movie;
 import Entities.Validators.ValidatorException;
+import Repository.Repository;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -16,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import Repository.InMemoryRepository;
 
 /**
  * @author Rares.
