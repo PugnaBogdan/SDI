@@ -39,12 +39,12 @@ public class AppConfig {
     }
 
     @Bean
-    ClientSpringDBRepo repo(){
+    ClientSpringDBRepo clientRepo(){
         return new ClientSpringDBRepo();
     }
 
 
     @Bean
-    ClientValidator validator() {return new ClientValidator();}
+    ClientValidator clientValidator() {return new ClientValidator();}
 
 }
