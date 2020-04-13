@@ -69,6 +69,7 @@ public class UserInterface {
     public void printClients(String[] arguments) {
         try{
             Set<Client> clients = clientService.getAllClients();
+            clients.forEach(System.out::println);
         }
         catch (Exception e)
         {

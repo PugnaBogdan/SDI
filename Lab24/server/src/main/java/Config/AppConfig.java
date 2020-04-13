@@ -17,19 +17,18 @@ import org.springframework.remoting.rmi.RmiServiceExporter;
 public class AppConfig {
 
 
-    @Bean(name = "ClientService")
+    @Bean
     RmiServiceExporter rmiServiceExporterClient() {
         RmiServiceExporter rmiServiceExporter = new RmiServiceExporter();
         rmiServiceExporter.setServiceName("ClientService");
         rmiServiceExporter.setServiceInterface(ClientService.class);
-        rmiServiceExporter.setService(serverClientService());
-        rmiServiceExporter.setRegistryPort(1099);
+        rmiServiceExporter.setService(clientServiceServer());
         return rmiServiceExporter;
     }
 
 
     @Bean
-    ClientService serverClientService(){
+    ClientService clientServiceServer(){
         return new ServerControllerClient();
     }
 
@@ -47,7 +46,5 @@ public class AppConfig {
 
     @Bean
     ClientValidator validator() {return new ClientValidator();}
-
-
 
 }
