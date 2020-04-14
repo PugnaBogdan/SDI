@@ -11,7 +11,7 @@ import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
+
 public class RentalControllerClient implements RentalService {
     @Autowired
     RentalService rentalController;

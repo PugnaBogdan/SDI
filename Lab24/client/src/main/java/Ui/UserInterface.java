@@ -4,7 +4,6 @@ import Controller.*;
 import Entities.Client;
 import Entities.Movie;
 import Entities.RentAction;
-import org.w3c.dom.ls.LSOutput;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -16,31 +15,39 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 
 
 public class UserInterface {
+    private ExecutorService executorService;
     private ClientService clientService;
     private MovieService movieService;
     private RentalService rentalController;
     private static Scanner input = new Scanner(System.in);
 
-    public UserInterface(ClientService clientController, MovieService movieService, RentalService rentalService) {
+    public UserInterface(ClientService clientController, MovieService movieService, RentalService rentalService, ExecutorService executorService) {
         this.clientService = clientController;
         this.movieService = movieService;
         this.rentalController = rentalService;
+        this.executorService = executorService;
                 //this.rentalController = rentalService;
     }
 
 
     public void addClient(String[] arguments)
     {
-        try{
-            Client newClient = new Client(Integer.parseInt(arguments[2]),arguments[3],Integer.parseInt(arguments[4]));
-            this.clientService.addClient(newClient);
-            System.out.println("Client added!");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        CompletableFuture.supplyAsync(
+                ()->{
+                    Client newClient = new Client(Integer.parseInt(arguments[2]),arguments[3],Integer.parseInt(arguments[4]));
+                    try {
+                        this.clientService.addClient(newClient);
+                    } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
+                        e.printStackTrace();
+                    }
+
+                    return null;
+                }).thenAcceptAsync(response -> System.out.println("Client added!"));
     }
 
     public void updateClient(String[] arguments)
@@ -69,17 +76,17 @@ public class UserInterface {
     }
 
 
-    public void printClients(String[] arguments) {
-        try{
-            Set<Client> clients = clientService.getAllClients();
-            clients.forEach(System.out::println);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
+    public void printClients(String[] arguments) throws SAXException, InterruptedException, TransformerException, IOException, SQLException, ParserConfigurationException {
+        CompletableFuture.supplyAsync(
+                () -> {
+                    try {
+                        return clientService.getAllClients();
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                        return null;
+                    }}).thenAcceptAsync(entity->entity.forEach(System.out::println));
     }
+
 
     public void filterClientsId(String[] arguments)
     {
@@ -109,14 +116,14 @@ public class UserInterface {
 
 
     public void printMovies(String[] arguments) {
-        try{
-            Set<Movie> movies = movieService.getAllMovies();
-            movies.forEach(System.out::println);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        CompletableFuture.supplyAsync(
+                () -> {
+                    try {
+                        return movieService.getAllMovies();
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                        return null;
+                    }}).thenAcceptAsync(entity->entity.forEach(System.out::println));
 
     }
 
@@ -189,14 +196,14 @@ public class UserInterface {
     /// RENTALS -------------------------------------------------------------------------------
 
     public void printRents(String[] arguments) {
-        try{
-            Set<RentAction> rents = rentalController.getAllRentals();
-            rents.forEach(System.out::println);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        CompletableFuture.supplyAsync(
+                () -> {
+                    try {
+                        return rentalController.getAllRentals();
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                        return null;
+                    }}).thenAcceptAsync(entity->entity.forEach(System.out::println));
 
     }
     public void addRent(String[] arguments)
@@ -260,7 +267,7 @@ public class UserInterface {
         String command;
         try {
             while (true) {
-                printMenu();
+                //printMenu();
                 command = input.nextLine();
                 String[] arguments = Arrays.stream(command.split(" ")).toArray(String[]::new);
 
@@ -280,10 +287,13 @@ public class UserInterface {
                 } else if (arguments[0].equals("print")) {
                     if (arguments[1].equals("clients")) {
                         printClients(arguments);
+                        System.out.println("");
                     } else if (arguments[1].equals("movies")) {
                         printMovies(arguments);
+                        System.out.println("");
                     } else if (arguments[1].equals("rents")) {
                         printRents(arguments);
+                        System.out.println("");
                     }else {
                         System.out.println("idk who's that ¯\\_(ツ)_/¯");
                     }
@@ -361,7 +371,7 @@ public class UserInterface {
                 }
             }
         }
-        catch (InterruptedIOException e){
+        catch (InterruptedIOException | InterruptedException e){
             e.printStackTrace();
         }
     }

@@ -15,7 +15,6 @@ public class ClientControllerClient implements ClientService {
     @Autowired
     ClientService clientService;
 
-
     @Override
     public void updateClient(Client client) throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException, SQLException {
         clientService.updateClient(client);
@@ -27,7 +26,7 @@ public class ClientControllerClient implements ClientService {
     }
 
     @Override
-    public Set<Client> getAllClients() throws SQLException, ParserConfigurationException, TransformerException, SAXException, IOException {
+    public Set<Client> getAllClients() throws SQLException, ParserConfigurationException, TransformerException, SAXException, IOException, InterruptedException {
         return clientService.getAllClients();
     }
 

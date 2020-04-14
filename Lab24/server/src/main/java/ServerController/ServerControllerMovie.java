@@ -18,7 +18,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class ServerControllerMovie implements MovieService {
     @Autowired
-    private MovieController movieController;
+    private MovieService movieController;
 
     @Override
     public Set<Movie> getAllMovies() throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException, SQLException {

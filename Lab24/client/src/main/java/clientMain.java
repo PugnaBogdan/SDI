@@ -15,6 +15,9 @@ import java.util.concurrent.Executors;
 
 public class clientMain {
     public static void main(String args[]) throws SQLException, TransformerException, ParserConfigurationException, SAXException, IOException {
+
+        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
         System.out.println("client on");
         AnnotationConfigApplicationContext context =
                 new AnnotationConfigApplicationContext(
@@ -25,7 +28,7 @@ public class clientMain {
             ClientService clientService = context.getBean(ClientService.class);
             MovieService movieService = context.getBean(MovieService.class);
             RentalService rentalService = context.getBean(RentalService.class);
-            UserInterface console = new UserInterface(clientService, movieService, rentalService);
+            UserInterface console = new UserInterface(clientService, movieService, rentalService, executorService);
 
             console.run();
         }

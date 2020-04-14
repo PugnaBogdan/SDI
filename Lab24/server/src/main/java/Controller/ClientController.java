@@ -25,17 +25,19 @@ public class ClientController implements ClientService {
     @Autowired
     private ClientValidator clientValidator;
 
-
-
-
     public Optional<Client> getById(Integer clientId) throws SQLException {
         return clientRepo.findOne(clientId);
     }
 
-    public Set<Client> getAllClients() throws SQLException {
+    public Set<Client> getAllClients() throws SQLException, InterruptedException {
+        try{
+            Thread.sleep(10000);
+        }
+        catch (Exception e){
+
+        }
         Iterable<Client> clients = clientRepo.findAll();
         Set<Client> set = new HashSet<>();
-
         clients.forEach(set::add);
         return set;
     }
@@ -89,7 +91,7 @@ public class ClientController implements ClientService {
            try {
                Iterable<Client> clients = clientRepo.findAll();
                clients.forEach(all::add);
-           } catch (SQLException e) {
+           } catch (SQLException | InterruptedException e) {
                e.printStackTrace();
            }
            all.removeIf(client->client.getId()%2!=0);
@@ -109,7 +111,7 @@ public class ClientController implements ClientService {
                 Iterable<Client> clients = clientRepo.findAll();
                 clients.forEach(all::add);
                 all.removeIf(client->client.getName().length() < length);
-            } catch (SQLException e) {
+            } catch (SQLException | InterruptedException e) {
                 e.printStackTrace();
             }
 

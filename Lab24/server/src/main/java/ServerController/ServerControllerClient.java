@@ -16,7 +16,7 @@ import java.util.Set;
 
 public class ServerControllerClient implements ClientService {
     @Autowired
-    private ClientController clientController;
+    private ClientService clientController;
 
 
     @Override
@@ -30,7 +30,7 @@ public class ServerControllerClient implements ClientService {
     }
 
     @Override
-    public Set<Client> getAllClients() throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException, SQLException {
+    public Set<Client> getAllClients() throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException, SQLException, InterruptedException {
         return clientController.getAllClients();
     }
 

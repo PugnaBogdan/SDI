@@ -15,7 +15,7 @@ public interface ClientService {
 
     void updateClient(Client client) throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException, SQLException;
     void addClient(Client client) throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException, SQLException;
-    Set<Client> getAllClients() throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException, SQLException;
+    Set<Client> getAllClients() throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException, SQLException, InterruptedException;
     void deleteClient(int id) throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException, SQLException;
     Set<Client> filterClientsId() throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException, SQLException;
     Set<Client> filterClientsName(int length) throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException, SQLException;

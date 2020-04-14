@@ -33,7 +33,7 @@ public class ClientSpringDBRepo implements Repository<Integer, Client> {
     }
 
     @Override
-    public Iterable<Client> findAll() throws SQLException {
+    public Iterable<Client> findAll() throws SQLException, InterruptedException {
         String sql = "select * from clients";
         return operations.query(sql, (rs, rowNum) -> {
             int id = rs.getInt("clientId");

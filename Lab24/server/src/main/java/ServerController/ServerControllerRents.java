@@ -16,7 +16,7 @@ import java.util.Set;
 
 public class ServerControllerRents implements RentalService {
     @Autowired
-    private RentalController rentalController;
+    private RentalService rentalController;
 
     @Override
     public Set<RentAction> getAllRentals() throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException, SQLException {

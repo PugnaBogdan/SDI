@@ -20,7 +20,6 @@ import org.springframework.remoting.rmi.RmiServiceExporter;
 @Configuration
 public class AppConfig {
 
-
     @Bean
     RmiServiceExporter rmiServiceExporterClient() {
         RmiServiceExporter rmiServiceExporter = new RmiServiceExporter();
@@ -29,7 +28,6 @@ public class AppConfig {
         rmiServiceExporter.setService(clientServiceServer());
         return rmiServiceExporter;
     }
-
     @Bean
     RmiServiceExporter rmiServiceExporterMovie() {
         RmiServiceExporter rmiServiceExporter = new RmiServiceExporter();
@@ -47,50 +45,37 @@ public class AppConfig {
         return rmiServiceExporter;
     }
 
+
+    //server services
     @Bean
     RentalService rentalServiceServer() {
-        return new ServerControllerRents();
+        return new RentalController();
     }
-
     @Bean
     MovieService movieServiceServer() {
-        return new ServerControllerMovie();
+        return new MovieController();
     }
-
-
     @Bean
     ClientService clientServiceServer(){
-        return new ServerControllerClient();
+        return new ClientController();
     }
 
 
     //client
     @Bean
-    ClientController clientController()
-    {
-        return new ClientController() ;
-    }
-
-    @Bean
     ClientSpringDBRepo clientRepo(){
         return new ClientSpringDBRepo();
     }
-
     @Bean
     ClientValidator clientValidator() {return new ClientValidator();}
 
     //movie
-
-    @Bean
-    MovieController movieController(){ return new MovieController();}
     @Bean
     MovieSpringDBRepo movieRepo(){return new MovieSpringDBRepo();}
     @Bean
     MovieValidator movieValidator(){return new MovieValidator();}
 
     //rents
-    @Bean
-    RentalController rentalController(){return new RentalController();}
     @Bean
     RentalSpringDBRepo rentalRepo(){return new RentalSpringDBRepo();}
     @Bean

@@ -31,7 +31,7 @@ public interface Repository<ID, T extends BaseEntity<ID>> {
      *
      * @return all entities.
      */
-    Iterable<T> findAll() throws SQLException;
+    Iterable<T> findAll() throws SQLException, InterruptedException;
 
     /**
      * Saves the given entity.
