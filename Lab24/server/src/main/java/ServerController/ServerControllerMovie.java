@@ -1,6 +1,8 @@
-package Controller;
+package ServerController;
 
-import Entities.Client;
+import Controller.ClientController;
+import Controller.MovieController;
+import Controller.MovieService;
 import Entities.Movie;
 import Entities.Validators.ValidatorException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,13 +12,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
 
-public class MovieControllerClient implements MovieService {
+public class ServerControllerMovie implements MovieService {
     @Autowired
-    MovieService movieController;
+    private MovieController movieController;
 
     @Override
     public Set<Movie> getAllMovies() throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException, SQLException {

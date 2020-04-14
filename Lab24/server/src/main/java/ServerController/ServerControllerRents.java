@@ -1,6 +1,7 @@
-package Controller;
+package ServerController;
 
-import Entities.Movie;
+import Controller.RentalController;
+import Controller.RentalService;
 import Entities.RentAction;
 import Entities.Validators.ValidatorException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,11 +11,12 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-public class RentalControllerClient implements RentalService {
+import java.util.List;
+import java.util.Set;
+
+public class ServerControllerRents implements RentalService {
     @Autowired
-    RentalService rentalController;
+    private RentalController rentalController;
 
     @Override
     public Set<RentAction> getAllRentals() throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException, SQLException {

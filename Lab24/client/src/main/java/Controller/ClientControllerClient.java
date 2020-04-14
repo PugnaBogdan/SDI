@@ -48,7 +48,7 @@ public class ClientControllerClient implements ClientService {
 
     @Override
     public Optional<Client> getById(Integer clientId) throws SQLException {
-        return Optional.empty();
+        return clientService.getById(clientId);
     }
 
 

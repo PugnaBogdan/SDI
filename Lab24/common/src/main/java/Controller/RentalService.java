@@ -13,13 +13,11 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public interface RentalService {
-    CompletableFuture<Set<RentAction>> getAllRentals() throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException,SQLException;
-    CompletableFuture<Void> addRental(RentAction rentalToAdd) throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException,SQLException;
-    CompletableFuture<Void> updateRental(RentAction rent)throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException,SQLException;
-    CompletableFuture<Void> deleteRent(Integer rentToDelete)throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException,SQLException;
-    CompletableFuture<Void> deleteClientCascade(int clientToDelete)throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException,SQLException;
-    CompletableFuture<Void> deleteMovieCascade(int movieToDelete)throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException,SQLException;
-    CompletableFuture<List<Integer>> getMostActiveClient() throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException,SQLException;
-    CompletableFuture<List<Integer>> getMostRentedMovie()throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException,SQLException;
-    CompletableFuture<List<String>> getRentedMoviesOfMostActiveClient() throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException,SQLException;
+    Set<RentAction> getAllRentals() throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException,SQLException;
+    void addRental(RentAction rentalToAdd) throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException,SQLException;
+    void updateRental(RentAction rent)throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException,SQLException;
+    void deleteRent(Integer rentToDelete)throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException,SQLException;
+    List<Integer> getMostActiveClient() throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException,SQLException;
+    List<Integer> getMostRentedMovie()throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException,SQLException;
+    List<String> getRentedMoviesOfMostActiveClient() throws ValidatorException, IOException, ParserConfigurationException, SAXException, TransformerException,SQLException;
 }

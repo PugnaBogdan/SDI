@@ -1,5 +1,7 @@
 
 import Controller.ClientService;
+import Controller.MovieService;
+import Controller.RentalService;
 import Ui.UserInterface;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.xml.sax.SAXException;
@@ -13,7 +15,7 @@ import java.util.concurrent.Executors;
 
 public class clientMain {
     public static void main(String args[]) throws SQLException, TransformerException, ParserConfigurationException, SAXException, IOException {
-
+        System.out.println("client on");
         AnnotationConfigApplicationContext context =
                 new AnnotationConfigApplicationContext(
                         "clientConfig"
@@ -21,7 +23,9 @@ public class clientMain {
 
         try {
             ClientService clientService = context.getBean(ClientService.class);
-            UserInterface console = new UserInterface(clientService);
+            MovieService movieService = context.getBean(MovieService.class);
+            RentalService rentalService = context.getBean(RentalService.class);
+            UserInterface console = new UserInterface(clientService, movieService, rentalService);
 
             console.run();
         }

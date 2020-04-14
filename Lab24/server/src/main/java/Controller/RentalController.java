@@ -7,6 +7,10 @@ import Entities.Validators.RentValidator;
 import Entities.Validators.RentalException;
 import Entities.Validators.ValidatorException;
 import Repository.Repository;
+import Repository.SpringDB.ClientSpringDBRepo;
+import Repository.SpringDB.MovieSpringDBRepo;
+import Repository.SpringDB.RentalSpringDBRepo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -23,45 +27,38 @@ import static java.util.stream.Collectors.toMap;
 
 public class RentalController implements RentalService{
 
-    private Repository<Integer, RentAction> repo;
-    private RentValidator validator;
-    private ClientService clientController;
-    private MovieService movieController;
+
+    @Autowired
+    private RentalSpringDBRepo rentalRepo;
+    @Autowired
+    private RentValidator rentValidator;
+    @Autowired
+    private MovieSpringDBRepo movieSpringDBRepo;
+    @Autowired
+    private ClientSpringDBRepo clientSpringDBRepo;
+
+
     private HashMap<Integer,Integer> mostRentedMovie = new HashMap<Integer,Integer>();
     private HashMap<Integer,Integer> mostActiveClient = new HashMap<Integer,Integer>();
     private List<String> rentalOfMostActive = new ArrayList<String>();
-    private ExecutorService executorService;
 
-    public RentalController(Repository<Integer, RentAction> repo, ClientService initClientController, MovieService initMovieController, ExecutorService executorService) throws SQLException {
-        this.repo = repo;
-        validator = new RentValidator();
-        clientController = initClientController;
-        movieController = initMovieController;
-        this.executorService = executorService;
+
+
+    public Set<RentAction> getAllRentals() throws SQLException {
+        Iterable<RentAction> movies = rentalRepo.findAll();
+        Set<RentAction> set = new HashSet<>();
+        movies.forEach(set::add);
+        return set;
     }
 
-
-    public CompletableFuture<Set<RentAction>> getAllRentals() throws SQLException {
-        return CompletableFuture.supplyAsync(()-> {
-            Iterable<RentAction> rentals = null;
-            try {
-                rentals = repo.findAll();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            return (Set<RentAction>) rentals;
-        },executorService);
-    }
-
-    public CompletableFuture<Void> addRental(RentAction rentalToAdd) throws ValidatorException {
-        return CompletableFuture.supplyAsync(()-> {
+    public void addRental(RentAction rentalToAdd) throws ValidatorException {
             try {
 
                 int clientID = rentalToAdd.getClientId();
                 int movieID = rentalToAdd.getMovieId();
 
-                Optional<Client> c = clientController.getById(clientID);
-                Optional<Movie> m = movieController.getById(movieID);
+                Optional<Client> c = clientSpringDBRepo.findOne(clientID);
+                Optional<Movie> m = movieSpringDBRepo.findOne(movieID);
 
                 if (c.isEmpty())
                     throw new ValidatorException("Client does not exist");
@@ -69,9 +66,9 @@ public class RentalController implements RentalService{
                 if (m.isEmpty())
                     throw new ValidatorException("Movie does not exist");
 
-                validator.validate(rentalToAdd);
+                rentValidator.validate(rentalToAdd);
 
-                repo.save(rentalToAdd);
+                rentalRepo.save(rentalToAdd);
                 updateReports(rentalToAdd);
 
 
@@ -79,48 +76,47 @@ public class RentalController implements RentalService{
             catch(ValidatorException | NumberFormatException | ParserConfigurationException | TransformerException | SAXException | IOException | SQLException v)
             {
                 throw new ValidatorException(v.getMessage());
-            } catch (InterruptedException | ExecutionException e) {
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
                 e.printStackTrace();
             }
-            return null;
 
-        },executorService);
     }
 
-    public CompletableFuture<Void> updateRental(RentAction rent) {
-        return CompletableFuture.supplyAsync(()-> {
+    public void updateRental(RentAction rent) {
             try {
 
                 int clientID = rent.getClientId();
                 int movieID = rent.getMovieId();
 
-                Optional<Client> c = clientController.getById(clientID);
-                Optional<Movie> m = movieController.getById(movieID);
+                Optional<Client> c = clientSpringDBRepo.findOne(clientID);
+                Optional<Movie> m = movieSpringDBRepo.findOne(movieID);
 
-                if (!c.isPresent())
+                if (c.isEmpty())
                     throw new ValidatorException("Client does not exist");
 
-                if (!m.isPresent())
+                if (m.isEmpty()) {
                     throw new ValidatorException("Movie does not exist");
+                }
 
-                validator.validate(rent);
-                repo.update(rent);
+                rentValidator.validate(rent);
+                rentalRepo.update(rent);
                 updateReports(rent);
 
             } catch(ValidatorException | NumberFormatException | ParserConfigurationException | TransformerException | SAXException | IOException | SQLException v)
             {
                 throw new ValidatorException(v.getMessage());
-            } catch (InterruptedException | ExecutionException e) {
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
                 e.printStackTrace();
             }
-            return null;
-        },executorService);
     }
 
 
-    public CompletableFuture<List<Integer>> getMostActiveClient() throws SQLException {
+    public List<Integer> getMostActiveClient() throws SQLException {
         updateTheReports();
-        return CompletableFuture.supplyAsync(()-> {
             Map<Integer, Integer> mostActive = mostActiveClient.entrySet()
                     .stream()
                     .sorted(Map.Entry.comparingByValue())
@@ -130,12 +126,10 @@ public class RentalController implements RentalService{
             //System.out.println(mostActive);
 
             return new ArrayList<>(mostActive.keySet());
-        });
     }
 
-    public CompletableFuture<List<Integer>> getMostRentedMovie() throws SQLException {
+    public List<Integer> getMostRentedMovie() throws SQLException {
         updateTheReports();
-        return CompletableFuture.supplyAsync(()-> {
             Map<Integer, Integer> mostRented = mostRentedMovie.entrySet()
                     .stream()
                     .sorted(Map.Entry.comparingByValue())
@@ -145,43 +139,38 @@ public class RentalController implements RentalService{
             //System.out.println(mostRented);
 
             return new ArrayList<>(mostRented.keySet());
-        });
 
     }
 
-    public CompletableFuture<List<String>> getRentedMoviesOfMostActiveClient() throws SQLException {
+    public List<String> getRentedMoviesOfMostActiveClient() throws SQLException {
 
-        return CompletableFuture.supplyAsync(()-> {
             List<Integer> mostActive = null;
             try {
-                mostActive = new ArrayList<>(getMostActiveClient().get());
+                mostActive = new ArrayList<>(getMostActiveClient());
 
-            } catch (SQLException | InterruptedException | ExecutionException e) {
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
             int clientId = mostActive.get(mostActive.size() - 1);
             Set<String> all = null;
-            try {
-                all = ((Set<RentAction>) repo.findAll()).stream()
-                        .filter(e -> e.getClientId() == clientId)
-                        .map(ra -> {
-                            try {
-                                System.out.println(ra.getMovieId());
-                                return movieController.getById(ra.getMovieId());
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                            }
-                            return null;
-                        })
-                        .filter(Objects::nonNull)
-                        .filter(Optional::isPresent)
-                        .map(o -> o.get().getTitle())
-                        .collect(Collectors.toSet());
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            return new ArrayList<String>(all);
-        });
+            Set<RentAction > x = getAllRentals();
+
+        all = x.stream()
+                .filter(e -> e.getClientId() == clientId)
+                .map(ra -> {
+                    try {
+                        System.out.println(ra.getMovieId());
+                        return movieSpringDBRepo.findOne(ra.getMovieId());
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .filter(Optional::isPresent)
+                .map(o -> o.get().getTitle())
+                .collect(Collectors.toSet());
+        return new ArrayList<String>(all);
     }
 
 
@@ -189,7 +178,7 @@ public class RentalController implements RentalService{
         mostRentedMovie = new HashMap<Integer,Integer>();
         mostActiveClient = new HashMap<Integer,Integer>();
         rentalOfMostActive = new ArrayList<String>();
-        Set<RentAction> rents = (Set<RentAction>) repo.findAll();
+        Iterable<RentAction> rents = rentalRepo.findAll();
         for(RentAction r: rents){
             try{
                 updateReports(r);
@@ -230,66 +219,17 @@ public class RentalController implements RentalService{
         }
         else
             mostRentedMovie.putIfAbsent(movieKey,1);
-
-         //rentalOfMostActive = new ArrayList<>(getRentedMoviesOfMostActiveClient().get());
     }
 
 
-    public CompletableFuture<Void> deleteRent(Integer rentToDelete) throws ValidatorException{
-        return CompletableFuture.supplyAsync(()-> {
+    public void deleteRent(Integer rentToDelete) throws ValidatorException{
             try {
-                repo.delete(rentToDelete);
+                rentalRepo.delete(rentToDelete);
             } catch (ValidatorException v) {
                 throw new ValidatorException((v.getMessage()));
             } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
                 e.printStackTrace();
             }
-            return null;
-        },executorService);
     }
-
-    /// THEY DONT MATTER ANYMORE ----------------------------------
-    public CompletableFuture<Void> deleteClientCascade(int clientToDelete) throws ValidatorException, SQLException, ParserConfigurationException, TransformerException, SAXException, IOException {
-        return CompletableFuture.supplyAsync(()-> {
-            try {
-                clientController.deleteClient(clientToDelete);
-            } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
-                e.printStackTrace();
-            }
-            Iterable<RentAction> rentals = null;
-            try {
-                rentals = repo.findAll();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            rentals.forEach(Rent -> {
-                if (Rent.getClientId() == clientToDelete) {
-                    this.deleteRent(Rent.getRentId());
-                }
-            });
-            return null;
-        },executorService);
-    }
-
-    public CompletableFuture<Void> deleteMovieCascade(int movieToDelete) throws ValidatorException, SQLException, ParserConfigurationException, TransformerException, SAXException, IOException {
-        return CompletableFuture.supplyAsync(()-> {
-            try {
-                movieController.deleteMovie(movieToDelete);
-                Iterable<RentAction> rentals = null;
-                rentals = repo.findAll();
-                rentals.forEach(Rent -> {
-                    if (Rent.getMovieId() == movieToDelete) {
-                        this.deleteRent(Rent.getRentId());
-                    }
-                });
-            } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        },executorService);
-    }
-
-
 
 }

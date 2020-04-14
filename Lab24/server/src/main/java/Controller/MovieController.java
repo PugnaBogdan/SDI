@@ -2,9 +2,13 @@ package Controller;
 
 import Entities.Client;
 import Entities.Movie;
+import Entities.Validators.ClientValidator;
 import Entities.Validators.MovieValidator;
 import Entities.Validators.ValidatorException;
 import Repository.Repository;
+import Repository.SpringDB.ClientSpringDBRepo;
+import Repository.SpringDB.MovieSpringDBRepo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -22,78 +26,61 @@ import java.util.concurrent.ExecutorService;
  */
 public class MovieController implements MovieService {
 
-    private Repository<Integer, Movie> repo;
-    private MovieValidator validator;
-    private ExecutorService executorService;
+    @Autowired
+    private MovieSpringDBRepo movieRepo;
 
-    public MovieController(Repository<Integer, Movie> initRepo, ExecutorService executorService) {
-        repo = initRepo;
-        validator = new MovieValidator();
-        this.executorService = executorService;
-    }
+    @Autowired
+    private MovieValidator movieValidator;
 
     public Optional<Movie> getById(Integer movieId) throws SQLException {
-        return repo.findOne(movieId);
+        return movieRepo.findOne(movieId);
     }
 
-    public CompletableFuture<Set<Movie>> getAllMovies() throws SQLException {
-        Iterable<Movie> movies = repo.findAll();
+    public Set<Movie> getAllMovies() throws SQLException {
+        Iterable<Movie> movies = movieRepo.findAll();
         Set<Movie> set = new HashSet<>();
-        return CompletableFuture.supplyAsync (()->{
             movies.forEach(set::add);
             return set;
-        },executorService);
-
     }
 
-    @Override
-
-    public CompletableFuture<Void> addMovie(Movie movieToAdd) throws ValidatorException {
-        return CompletableFuture.supplyAsync(()->{
+    public void addMovie(Movie movieToAdd) throws ValidatorException {
             try
             {
-                validator.validate(movieToAdd);
-                repo.save(movieToAdd);
-                return null;
+                movieValidator.validate(movieToAdd);
+                movieRepo.save(movieToAdd);
+
             }
             catch(ValidatorException | NumberFormatException | ParserConfigurationException | TransformerException | SAXException | IOException | SQLException v)
             {
                 throw new ValidatorException(v.getMessage());
             }
 
-        },executorService);
     }
 
-    public CompletableFuture<Void> deleteMovie(int movieToDelete) throws ValidatorException{
-        return CompletableFuture.supplyAsync(()-> {
+    public void deleteMovie(int movieToDelete) throws ValidatorException{
             try {
-                repo.delete(movieToDelete);
+                movieRepo.delete(movieToDelete);
             } catch (ValidatorException v) {
                 throw new ValidatorException((v.getMessage()));
             } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
                 e.printStackTrace();
             }
-            return null;
-        },executorService);
+
     }
 
-    public CompletableFuture<Void> updateMovie(Movie updatedMovie) {
-        return CompletableFuture.supplyAsync(()-> {
+    public void updateMovie(Movie updatedMovie) {
             try {
-                repo.update(updatedMovie);
+                movieRepo.update(updatedMovie);
 
             } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
                 e.printStackTrace();
             }
-            return null;
-        },executorService);
     }
 
-    public CompletableFuture<Set<Movie>> filterEvenId() throws SQLException {
-        return CompletableFuture.supplyAsync(()-> {
+    public Set<Movie> filterEvenId() throws SQLException {
             Set<Movie> all = new HashSet<>();
             try {
-                Iterable<Movie> movies = repo.findAll();
+                Iterable<Movie> movies = movieRepo.findAll();
                 movies.forEach(all::add);
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -101,18 +88,16 @@ public class MovieController implements MovieService {
             all.removeIf(movie -> movie.getId() % 2 == 0);
 
             return all;
-        });
     }
 
     /*
     filters movies that have the title length less than some number
      */
 
-    public CompletableFuture<Set<Movie>> filterMoviesWithTitleLessThan(int length) throws SQLException {
-        return CompletableFuture.supplyAsync(()-> {
+    public Set<Movie> filterMoviesWithTitleLessThan(int length) throws SQLException {
             Set<Movie> all = new HashSet<>();
             try {
-                Iterable<Movie> movies = repo.findAll();
+                Iterable<Movie> movies = movieRepo.findAll();
                 movies.forEach(all::add);
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -120,6 +105,5 @@ public class MovieController implements MovieService {
             all.removeIf(movie -> movie.getTitle().length() > length);
 
             return all;
-        });
     }
 }
