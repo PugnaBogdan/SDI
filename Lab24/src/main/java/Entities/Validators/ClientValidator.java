@@ -1,19 +1,18 @@
 package Entities.Validators;
 
-        import Entities.Client;
+import Entities.Client;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Rares.
  */
 
+@Component
 public class ClientValidator implements Validator<Client> {
 
     @Override
     public void validate(Client client) throws ValidatorException {
         try {
-
-            if (client.getId() < 0)
-                throw new ValidatorException("Invalid ID!");
 
             if (client.getName().equals(""))
                 throw new ValidatorException("Empty Name!");

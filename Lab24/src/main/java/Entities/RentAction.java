@@ -5,14 +5,18 @@ package Entities;
 This class is needed as a many to many relation between clients and movies
 to properly rent movies
  */
+import javax.persistence.Entity;
 
+/**
+ * @author Rares.
+ */
+@Entity
 public class RentAction extends BaseEntity<Integer> {
     private int rentId;
     private int clientId;
     private int movieId;
 
-    public RentAction(int rentId, int clientId, int movieId) {
-        this.rentId = rentId;
+    public RentAction(int clientId, int movieId) {
         this.clientId = clientId;
         this.movieId = movieId;
     }
@@ -20,9 +24,7 @@ public class RentAction extends BaseEntity<Integer> {
     public RentAction() {
 
     }
-    public Integer getId(){
-        return rentId;
-    }
+
     public int getRentId() {
         return rentId;
     }
@@ -50,9 +52,9 @@ public class RentAction extends BaseEntity<Integer> {
     @Override
     public String toString() {
         return "RentAction{" +
-                "rentId=" + rentId +
+                "rentId=" + getId() +
                 ",Client with clientId=" + clientId +
                 ",rented movie with movieId=" + movieId +
                 '}';
-    }
+}
 }

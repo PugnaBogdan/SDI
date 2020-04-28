@@ -3,16 +3,20 @@ package Entities;
 /**
  * @author Rares.
  */
+import javax.persistence.Entity;
 
+/**
+ * @author Rares.
+ */
+@Entity
 public class Movie extends BaseEntity<Integer> {
 
     private String title;
     private int movieId;
     private int price;
 
-    public Movie(int initId, String initTitle, int initPrice )
+    public Movie( String initTitle, int initPrice )
     {
-        this.movieId=initId;
         this.title=initTitle;
         this.price = initPrice;
     }
@@ -24,15 +28,11 @@ public class Movie extends BaseEntity<Integer> {
     @Override
     public String toString() {
         return "Movie{" +
-                "movieId=" + movieId +
+                "movieId=" + getId() +
                 ", title='" + title + '\'' +
 
                 ", price=" + price +
                 '}';
-    }
-
-    public Integer getId() {
-        return movieId;
     }
 
     public int getPrice() {

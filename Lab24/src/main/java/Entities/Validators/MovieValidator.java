@@ -5,13 +5,13 @@ package Entities.Validators;
 /**
  * @author Rares.
  */
+        import org.springframework.stereotype.Component;
 
+@Component
 public class MovieValidator implements Validator<Movie> {
 
     @Override
     public void validate(Movie movie) throws ValidatorException {
-        if(movie.getId() < 0)
-            throw new ValidatorException("Invalid ID!");
 
         if(movie.getTitle().equals(""))
             throw new ValidatorException("Empty Title!");

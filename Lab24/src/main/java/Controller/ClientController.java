@@ -1,85 +1,102 @@
 package Controller;
 
         import Entities.Client;
-        import Entities.RentAction;
         import Entities.Validators.ClientValidator;
         import Entities.Validators.ValidatorException;
-        import Repository.Repository;
-        import Controller.RentalController;
-        import Repository.ClientFileRepository;
-        import Repository.RentalXMLRepository;
+        import Repository.*;
+        import org.slf4j.Logger;
+        import org.slf4j.LoggerFactory;
+        import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.stereotype.Service;
         import org.xml.sax.SAXException;
 
+        import javax.transaction.Transactional;
         import javax.xml.parsers.ParserConfigurationException;
         import javax.xml.transform.TransformerException;
         import java.io.IOException;
         import java.sql.SQLException;
+        import java.util.List;
         import java.util.Optional;
         import java.util.Set;
 
 /**
  * @author Rares.
  */
+@Service
+
 public class ClientController {
 
-    private Repository<Integer, Client> repo;
-    private ClientValidator validator;
+    public static final Logger log = LoggerFactory.getLogger(ClientController.class);
 
-    public ClientController(Repository<Integer, Client> initRepo)
-    {
-        this.repo=initRepo;
-        validator = new ClientValidator();
+
+    @Autowired
+    private ClientRepo repo;
+    @Autowired
+    private ClientValidator validator ;
+
+
+
+    public Optional<Client> getById(Integer clientId) {
+        return repo.findById(clientId);
+
     }
 
-
-
-    public Optional<Client> getById(Integer clientId) throws SQLException {
-        return repo.findOne(clientId);
-    }
-
-    public Set<Client> getAllClients() throws SQLException {
+    public List<Client> getAllClients() {
+        log.trace("getAllClients - method entered");
         Iterable<Client> clients = repo.findAll();
-        return (Set<Client>) clients;
+        log.trace("getAllClients - method finished");
+        return (List<Client>) clients;
     }
 
-    public void addClient(Client clientToSave) throws ValidatorException, ParserConfigurationException, IOException, SAXException, TransformerException, SQLException {
+    public void addClient(Client clientToSave) {
         try
         {
-            validator.validate(clientToSave);
 
+            log.trace("addClient - method entered with client :",clientToSave);
+            validator.validate(clientToSave);
+            repo.save(clientToSave);
+            log.trace("addClient - method finished");
         }
-        catch(ValidatorException | NumberFormatException v)
+        catch(ValidatorException v)
         {
             throw new ValidatorException(v.getMessage());
         }
-        repo.save(clientToSave);
+
     }
 
-    public void deleteClient(Integer clientToDelete) throws ValidatorException{
+    public void deleteClient(Integer clientToDelete) throws ValidatorException {
         try{
-            repo.delete(clientToDelete);
+            log.trace("deleteClient - method entered with id :",clientToDelete);
+            repo.deleteById(clientToDelete);
+            log.trace("deleteClient - method finished");
         }
         catch (ValidatorException v){
             throw  new ValidatorException((v.getMessage()));
-        } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
-            e.printStackTrace();
         }
     }
 
-    public void updateClient(Client UpdatedClient) {
-        try{
-            repo.update(UpdatedClient);
+    @Transactional
+    public void updateClient(Client UpdatedClient) throws Exception {
 
-        } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
-            e.printStackTrace();
-        }
+        log.trace("updateClient - method entered with client :",UpdatedClient);
+
+        repo.findById(UpdatedClient.getId())
+                .ifPresent(u -> {
+                    u.setName(UpdatedClient.getName());
+                    u.setAge(UpdatedClient.getAge());
+                    log.debug("updateClient - updated: client={}", u);
+                });
+
+        log.trace("updateClient - method finished");
     }
 
-    public Set<Client> filterOddId() throws SQLException {
+    public List<Client> filterOddId() throws Exception {
 
-        Set<Client> all = (Set<Client>) repo.findAll();
+        log.trace("filterOddClients - method entered");
+        List<Client> all = (List<Client>) repo.findAll();
         all.removeIf(client->client.getId()%2!=0);
 
+        log.trace("filterOddClients - method finished");
         return all;
     }
 
@@ -87,10 +104,11 @@ public class ClientController {
     filters clients that have the name length less than some number
      */
 
-    public Set<Client> filterClientsWithNameLessThan(int length) throws SQLException {
-        Set<Client> all = (Set<Client>) repo.findAll();
+    public List<Client> filterClientsWithNameLessThan(int length) throws Exception {
+        log.trace("filterClientsWithNameLessThan - method entered");
+        List<Client> all = (List<Client>) repo.findAll();
         all.removeIf(client->client.getName().length() < length);
-
+        log.trace("filterClientsWithNameLessThan - method finished");
         return all;
     }
 }

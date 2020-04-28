@@ -1,17 +1,21 @@
 package Entities;
+/**
+ * @author Rares.
+ */
+import javax.persistence.Entity;
 
 /**
  * @author Rares.
  */
+@Entity
 public class Client extends BaseEntity<Integer> {
 
     private int clientId;
     private String name;
     private int age;
 
-    public Client(int initId, String initName, int initAge)
+    public Client( String initName, int initAge)
     {
-        clientId=initId;
         name=initName;
         age=initAge;
     }
@@ -23,16 +27,12 @@ public class Client extends BaseEntity<Integer> {
     @Override
     public String toString() {
         return "Client{" +
-                "clientId=" + clientId +
+                "clientId=" + getId() +
                 ", name='" + name + '\'' +
                 ", age=" + age +
                 '}';
     }
 
-    @Override
-    public Integer getId() {
-        return clientId;
-    }
 
     public String getName() {
         return name;

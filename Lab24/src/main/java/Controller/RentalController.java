@@ -6,45 +6,55 @@ import Entities.RentAction;
 import Entities.Validators.RentValidator;
 import Entities.Validators.RentalException;
 import Entities.Validators.ValidatorException;
-import Repository.Repository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
-
+import Repository.*;
+import javax.transaction.Transactional;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
+@Service
 
 public class RentalController {
 
-    private Repository<Integer, RentAction> repo;
+    public static final Logger log = LoggerFactory.getLogger(RentalController.class);
+
+    @Autowired
+    private RentalRepo repo;
+    @Autowired
     private RentValidator validator;
+    @Autowired
     private ClientController clientController;
+    @Autowired
     private MovieController movieController;
+
     private HashMap<Integer,Integer> mostRentedMovie = new HashMap<Integer,Integer>();
     private HashMap<Integer,Integer> mostActiveClient = new HashMap<Integer,Integer>();
     private ArrayList<String> rentalOfMostActive = new ArrayList<String>();
 
-    public RentalController(Repository<Integer, RentAction> repo, ClientController initClientController,MovieController initMovieController) {
-        this.repo = repo;
-        validator = new RentValidator();
-        clientController = initClientController;
-        movieController = initMovieController;
-    }
 
-    public Set<RentAction> getAllRentals() throws SQLException {
+
+    public List<RentAction> getAllRentals(){
+        log.trace("getAllRentals - method entered");
         Iterable<RentAction> rentals = repo.findAll();
-        return (Set<RentAction>) rentals;
+        log.trace("getAllRentals - method finished");
+        return (List<RentAction>) rentals;
     }
 
-    public void addRental(RentAction rentalToAdd) throws ValidatorException {
+    public void addRental(RentAction rentalToAdd) throws Exception {
         try {
+
+            log.trace("addRental - method entered with rental",rentalToAdd);
 
             int clientID = rentalToAdd.getClientId();
             int movieID = rentalToAdd.getMovieId();
@@ -63,18 +73,19 @@ public class RentalController {
             repo.save(rentalToAdd);
             updateReports(rentalToAdd);
 
+            log.trace("addRental - method finished");
+
         } catch (ValidatorException v) {
             throw new ValidatorException(v.getMessage());}
         catch (RentalException r){
             throw new RentalException(r.getMessage());
-        } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
-            e.printStackTrace();
         }
     }
 
-    public void updateRental(RentAction rent) {
+    @Transactional
+    public void updateRental(RentAction rent) throws Exception {
         try{
-
+            log.trace("updateRental - method entered with rental:",rent);
             int clientID = rent.getClientId();
             int movieID = rent.getMovieId();
 
@@ -88,21 +99,33 @@ public class RentalController {
                 throw new ValidatorException("Movie does not exist");
 
             validator.validate(rent);
-            repo.update(rent);
+
+            try{
+                repo.findById(rent.getId())
+                        .ifPresent(u -> {
+                            u.setClientId(rent.getClientId());
+                            u.setMovieId(rent.getMovieId());
+                            log.debug("updateClient - updated: rental={}", u);
+                        });
+                log.trace("updateRental - method finished");
+            } catch(Exception e)
+            {
+                throw new Exception(e.getMessage());
+            }
+
             updateReports(rent);
 
         } catch (ValidatorException v) {
             throw new ValidatorException(v.getMessage());}
         catch (RentalException r){
-                throw new RentalException(r.getMessage());
-        } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
-            e.printStackTrace();
+            throw new RentalException(r.getMessage());
         }
     }
 
 
     public List<Integer> getMostActiveClient()
     {
+        log.trace("getMostActiveClient - method entered");
 
         Map<Integer, Integer> mostActive = mostActiveClient.entrySet()
                 .stream()
@@ -111,12 +134,14 @@ public class RentalController {
                         LinkedHashMap::new));
 
         System.out.println(mostActive);
-
+        log.trace("getMostActiveClient - method finished");
         return new ArrayList<>(mostActive.keySet());
     }
 
     public List<Integer> getMostRentedMovie()
     {
+        log.trace("getMostRentedMovie - method entered");
+
         Map<Integer, Integer> mostRented = mostRentedMovie.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByValue())
@@ -125,35 +150,40 @@ public class RentalController {
 
         System.out.println(mostRented);
 
+        log.trace("getMostRentedMovie - method finished");
         return new ArrayList<>(mostRented.keySet());
 
     }
 
-    public List<String> getRentedMoviesOfMostActiveClient() throws SQLException {
+    public List<String> getRentedMoviesOfMostActiveClient() throws Exception{
+
+        log.trace("getRentedMovieOfMostActiveClient - method entered");
+
         List<Integer> mostActive = getMostActiveClient();
         int clientId = mostActive.get(mostActive.size()-1);
-        Set<String> all =  ((Set<RentAction>)repo.findAll()).stream()
+        List<String> all =  (repo.findAll()).stream()
                 .filter(e->e.getClientId()==clientId)
                 .map(ra-> {
                     try {
                         return movieController.getById(ra.getMovieId());
-                    } catch (SQLException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                     return null;
                 })
                 .filter(Optional::isPresent)
                 .map(o->o.get().getTitle())
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
 
+        log.trace("getRentedMovieOfMostActiveClient - method finished");
         return new ArrayList<String>(all);
     }
 
-    public void updateTheReports() throws SQLException {
+    public void updateTheReports() throws Exception {
         mostRentedMovie = new HashMap<Integer,Integer>();
         mostActiveClient = new HashMap<Integer,Integer>();
         rentalOfMostActive = new ArrayList<String>();
-        Set<RentAction> rents = (Set<RentAction>) repo.findAll();
+        List<RentAction> rents =  repo.findAll();
         for(RentAction r: rents){
             try{
                 updateReports(r);
@@ -162,21 +192,9 @@ public class RentalController {
                 throw new SQLException();
             }
         }
-
-            for(RentAction r: rents)
-            {
-                try {
-                    updateReports(r);
-                }
-
-                catch (SQLException e) {
-                    throw new SQLException();
-                }
-            }
-
     }
 
-    private void updateReports(RentAction rentalToAdd) throws SQLException {
+    private void updateReports(RentAction rentalToAdd) throws Exception {
         int clientKey = rentalToAdd.getClientId();
         int movieKey = rentalToAdd.getMovieId();
         int clientAmount=0,movieAmount=0;
@@ -196,18 +214,17 @@ public class RentalController {
         else
             mostRentedMovie.putIfAbsent(movieKey,1);
 
-         rentalOfMostActive = (ArrayList<String>) getRentedMoviesOfMostActiveClient();
+        rentalOfMostActive = (ArrayList<String>) getRentedMoviesOfMostActiveClient();
     }
 
 
-    public void deleteRent(Integer rentToDelete) throws ValidatorException{
+    public void deleteRent(Integer rentToDelete) throws ValidatorException {
         try{
-            repo.delete(rentToDelete);
+            repo.deleteById(rentToDelete);
+            log.trace("deleteRent - method finished");
         }
         catch (ValidatorException v){
             throw  new ValidatorException((v.getMessage()));
-        } catch (IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
-            e.printStackTrace();
         }
     }
 
@@ -216,7 +233,7 @@ public class RentalController {
         Iterable<RentAction> rentals = repo.findAll();
         rentals.forEach(Rent->{
             if(Rent.getClientId() == clientToDelete){
-                this.deleteRent(Rent.getRentId());
+                this.deleteRent(Rent.getId());
             }
         });
     }
@@ -226,11 +243,8 @@ public class RentalController {
         Iterable<RentAction> rentals = repo.findAll();
         rentals.forEach(Rent->{
             if(Rent.getMovieId() == movieToDelete){
-                this.deleteRent(Rent.getRentId());
+                this.deleteRent(Rent.getId());
             }
         });
     }
-
-
-
 }

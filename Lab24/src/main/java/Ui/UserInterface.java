@@ -8,7 +8,6 @@ package Ui;
         import Entities.RentAction;
         import Entities.Validators.RentalException;
         import Entities.Validators.ValidatorException;
-        import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
         import org.xml.sax.SAXException;
 
         import javax.xml.parsers.ParserConfigurationException;
@@ -17,28 +16,27 @@ package Ui;
         import java.io.IOException;
         import java.io.InputStreamReader;
         import java.sql.SQLException;
-        import java.util.Collection;
         import java.util.List;
-        import java.util.Map;
 
         import java.util.Set;
 
 /**
  * @author Pugna.
  */
+        import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.stereotype.Component;
+@Component
 public class UserInterface {
 
+    @Autowired
     private ClientController clientController;
+    @Autowired
     private MovieController movieController;
+    @Autowired
     private RentalController rentalController;
 
-    public UserInterface(ClientController clientController1, MovieController movieController1, RentalController rentalController) {
-        this.clientController = clientController1;
-        this.movieController = movieController1;
-        this.rentalController = rentalController;
-    }
 
-    public void runConsole() {
+    public void runConsole() throws Exception {
 
 
         while (true) {
@@ -100,7 +98,7 @@ public class UserInterface {
         }
     }
 
-    private void getReports() throws SQLException {
+    private void getReports() throws Exception {
 
         rentalController.updateTheReports();
         try {
@@ -122,30 +120,28 @@ public class UserInterface {
 
     }
 
-    private void printAllClients() throws SQLException {
-        Set<Client> clients = clientController.getAllClients();
+    private void printAllClients() throws Exception {
+        List<Client> clients = clientController.getAllClients();
         clients.forEach(System.out::println);
     }
 
-    private void printAllMovies() throws SQLException {
-        Set<Movie> students = movieController.getAllMovies();
+    private void printAllMovies() throws Exception {
+        List<Movie> students = movieController.getAllMovies();
         students.forEach(System.out::println);
     }
 
     private void printAllRents() throws SQLException {
-        Set<RentAction> rents = rentalController.getAllRentals();
+        List<RentAction> rents = rentalController.getAllRentals();
         rents.forEach(System.out::println);
     }
 
 
     private void addClient() {
 
-
+        Client client = readClient();
         try {
-            Client client = readClient();
-            if(client != null)
-                clientController.addClient(client);
-        } catch (ValidatorException | IOException | ParserConfigurationException | SAXException | TransformerException | SQLException e) {
+            clientController.addClient(client);
+        } catch (ValidatorException e) {
             System.out.println(e.getMessage());
         }
 
@@ -162,7 +158,7 @@ public class UserInterface {
 
     }
 
-    private void addRent() {
+    private void addRent() throws Exception {
 
         RentAction rent = readRent();
         try {
@@ -175,51 +171,49 @@ public class UserInterface {
     }
 
     private Client readClient() {
-        System.out.println("Read client {id, name, age}");
+        System.out.println("Read client {name, age}");
 
         BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
         try {
-            int id = Integer.parseInt(bufferRead.readLine());// ...
+
             String name = bufferRead.readLine();
             int age = Integer.parseInt(bufferRead.readLine());// ...
 
-            return new Client(id, name, age);
+            return new Client(name, age);
         } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        } catch (NumberFormatException ex) {
-            System.out.println("Number format exception " + ex.getMessage());
+            ex.printStackTrace();
         }
         return null;
     }
 
     private Movie readMovie() {
-        System.out.println("Read movie {id, title, price}");
+        System.out.println("Read movie {title, price}");
 
         BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
         try {
-            int id = Integer.parseInt(bufferRead.readLine());// ...
-            String titel = bufferRead.readLine();
+
+            String title = bufferRead.readLine();
             int price = Integer.parseInt(bufferRead.readLine());// ...
 
-            return new Movie(id, titel, price);
-        } catch (IOException | NumberFormatException ex) {
+            return new Movie( title, price);
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
         return null;
     }
 
     private RentAction readRent() {
-        System.out.println("Read rental {rentId, clientId, movieId}");
+        System.out.println("Read rental {clientId, movieId}");
 
         BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
         try {
-            int id = Integer.parseInt(bufferRead.readLine());// ...
+
             int id1 = Integer.parseInt(bufferRead.readLine());// ...
             int id2 = Integer.parseInt(bufferRead.readLine());// ...
 
-            return new RentAction(id, id1, id2);
-        } catch (IOException | NumberFormatException ex) {
-            System.out.println(ex.getMessage());
+            return new RentAction(id1, id2);
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
         return null;
     }
@@ -235,7 +229,7 @@ public class UserInterface {
             int id = Integer.parseInt(bufferRead.readLine());
             rentalController.deleteClient(id);
         } catch (IOException | SQLException e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -247,7 +241,7 @@ public class UserInterface {
             int id = Integer.parseInt(bufferRead.readLine());
             rentalController.deleteMovie(id);
         } catch (IOException | SQLException e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -259,12 +253,12 @@ public class UserInterface {
             int id = Integer.parseInt(bufferRead.readLine());
             rentalController.deleteRent(id);
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
     private Client updateClient() {
-        System.out.println("Read new clients attributes {id, name, age}");
+        System.out.println("Read new clients attributes {id,name, age}");
 
         BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
         try {
@@ -272,79 +266,82 @@ public class UserInterface {
             String name = bufferRead.readLine();
             int age = Integer.parseInt(bufferRead.readLine());// ...
 
-            Client newCLient = new Client(id, name, age);
+            Client newCLient = new Client(name, age);
+            newCLient.setId(id);
 
             clientController.updateClient(newCLient);
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
         return null;
 
     }
 
-    private Movie updateMovie() {
-        System.out.println("Read new movie attributes {id, ClientId, MovieId}");
+    private Movie updateMovie() throws Exception {
+        System.out.println("Read new movie attributes {id,title,price}");
 
         BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
         try {
             int id = Integer.parseInt(bufferRead.readLine());// ...
-            String titel = bufferRead.readLine();
+            String title = bufferRead.readLine();
             int price = Integer.parseInt(bufferRead.readLine());// ...
-            Movie movie = new Movie(id, titel, price);
+            Movie movie = new Movie(title, price);
+            movie.setId(id);
 
             movieController.updateMovie(movie);
         } catch (IOException ex) {
-            System.out.println(ex.getMessage());
+            ex.printStackTrace();
         }
         return null;
 
     }
 
     private Client updateRental() {
-        System.out.println("Read new rental {rentId, clientId, movieId}");
+        System.out.println("Read new rental {id,clientId, movieId}");
 
         BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
         try {
             int id = Integer.parseInt(bufferRead.readLine());// ...
             int id1 = Integer.parseInt(bufferRead.readLine());// ...
             int id2 = Integer.parseInt(bufferRead.readLine());// ...
-            RentAction rent = new RentAction(id, id1, id2);
+            RentAction rent = new RentAction(id1, id2);
+            rent.setId(id);
 
             rentalController.updateRental(rent);
-        } catch (IOException ex) {
-            ex.printStackTrace();
         } catch (ValidatorException e) {
             System.out.println(e.getMessage());
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
         return null;
 
     }
 
-    private void filterOddIdClient() throws SQLException {
-        Set<Client> filtered = clientController.filterOddId();
+    private void filterOddIdClient() throws Exception {
+        List<Client> filtered = clientController.filterOddId();
 
         filtered.forEach(System.out::println);
     }
 
-    private void filterEvenMovie() throws SQLException {
-        Set<Movie> filtered = movieController.filterEvenId();
+    private void filterEvenMovie() throws Exception {
+        List<Movie> filtered = movieController.filterEvenId();
         filtered.forEach(System.out::println);
 
 
     }
 
-    private void filterMovieByNameLength() throws IOException, SQLException {
+    private void filterMovieByNameLength() throws Exception {
         System.out.println("Type title length: ");
 
         BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
-        Set<Movie> filtered = movieController.filterMoviesWithTitleLessThan(Integer.parseInt(bufferRead.readLine()));
+        List<Movie> filtered = movieController.filterMoviesWithTitleLessThan(Integer.parseInt(bufferRead.readLine()));
         filtered.forEach(System.out::println);
     }
 
-    private void filterClientByNameLength() throws IOException, SQLException {
+    private void filterClientByNameLength() throws Exception {
         System.out.println("Type name length: ");
         BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
-        Set<Client> filtered = clientController.filterClientsWithNameLessThan(Integer.parseInt(bufferRead.readLine()));
+        List<Client> filtered = clientController.filterClientsWithNameLessThan(Integer.parseInt(bufferRead.readLine()));
         filtered.forEach(System.out::println);
     }
 }
