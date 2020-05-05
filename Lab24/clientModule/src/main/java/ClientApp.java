@@ -1,12 +1,6 @@
-import clientBase.Ui.UserInterface;
+import clientModulePackage.Ui.UserInterface;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.web.client.RestTemplate;
-import webBase.dto.ClientsDto;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.sql.SQLException;
 
 public class ClientApp {
 
@@ -15,7 +9,7 @@ public class ClientApp {
 
         AnnotationConfigApplicationContext context =
                 new AnnotationConfigApplicationContext(
-                        "clientBase.config"
+                        "clientModulePackage.config"
                 );
 
         RestTemplate restTemplate = context.getBean(RestTemplate.class);
