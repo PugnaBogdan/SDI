@@ -1,2 +1,5 @@
 rootProject.name = 'Lab24'
+include 'clientModule'
+include 'coreModule'
+include 'webModule'
 
