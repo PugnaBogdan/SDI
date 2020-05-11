@@ -1,8 +1,6 @@
 package coreModulePackage.Validators;
 
 import coreModulePackage.Entities.Client;
-import coreModulePackage.Validators.Validator;
-import coreModulePackage.Validators.ValidatorException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,7 +14,6 @@ public class ClientValidator implements Validator<Client> {
 
         if(client.getName().equals(""))
             throw new ValidatorException("Empty Name!");
-
         if(client.getAge()<0)
             throw new ValidatorException("Negative Age!");
     }
