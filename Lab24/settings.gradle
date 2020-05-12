@@ -1,5 +1,4 @@
-rootProject.name = 'Lab24'
-include 'clientModule'
-include 'coreModule'
-include 'webModule'
+rootProject.name = 'catalog-1-list'
+include 'catalog-core'
+include 'catalog-web'
 
