@@ -29,11 +29,11 @@ public class ClientController {
 
     @RequestMapping(value = "/clients", method = RequestMethod.GET)
     public List<ClientDto> getStudents() {
-        log.trace("getStudents");
+        log.trace("get Clients");
 
         List<Client> students = clientService.getAllClients();
 
-        log.trace("getStudents: students={}", students);
+        log.trace("getClients: clients={}", students);
 
         return new ArrayList<>(clientConverter.convertModelsToDtos(students));
     }
@@ -47,7 +47,7 @@ public class ClientController {
         ));
     }
 
-
+    @CrossOrigin
     @RequestMapping(value = "/clients", method = RequestMethod.PUT)
     ClientDto updateClient(@RequestBody ClientDto clientDto) throws Exception
     {
